@@ -6,7 +6,8 @@ namespace ScriptCs.Rebus
     {
         public void Initialize(IScriptPackSession session)
         {
-            throw new System.NotImplementedException();
+            session.AddReference("Rebus");
+            session.ImportNamespace("Rebus");
         }
 
         public IScriptPackContext GetContext()
