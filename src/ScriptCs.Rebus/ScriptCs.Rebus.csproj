@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Guard.cs" />
     <Compile Include="RebusScriptBus.cs" />
     <Compile Include="RebusScriptPack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

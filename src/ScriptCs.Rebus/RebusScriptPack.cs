@@ -6,13 +6,18 @@ namespace ScriptCs.Rebus
     {
         public void Initialize(IScriptPackSession session)
         {
-            session.AddReference("Rebus");
+            Guard.AgainstNullArgument("session", session);
+
             session.ImportNamespace("Rebus");
+            session.ImportNamespace("Rebus.Bus");
+            session.ImportNamespace("Rebus.Logging");
+            session.ImportNamespace("Rebus.Configuration");
+            session.ImportNamespace("Rebus.Transports.Msmq");
         }
 
         public IScriptPackContext GetContext()
         {
-            throw new System.NotImplementedException();
+            return new RebusScriptBus();
         }
 
         public void Terminate()
