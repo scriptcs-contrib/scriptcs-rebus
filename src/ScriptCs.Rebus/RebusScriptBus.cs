@@ -12,6 +12,10 @@ namespace ScriptCs.Rebus
     {
         private IBus _bus;
 
+        public void Subscribe(object message)
+        {
+        }
+
         public void Send(string destination, object message)
         {
             Guard.AgainstNullArgument("destination", destination);
@@ -32,7 +36,7 @@ namespace ScriptCs.Rebus
         {
             _bus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(configurer => configurer.None())
-                .Transport(configurer => configurer.UseMsmq("ScriptCs.Rebus.Input", "ScriptCs.Rebus.Error"))
+                .Transport(configurer => configurer.UseMsmqInOneWayClientMode() /*configurer.UseMsmq("ScriptCs.Rebus.Input", "ScriptCs.Rebus.Error")*/)
                 .CreateBus()
                 .Start();
         }
