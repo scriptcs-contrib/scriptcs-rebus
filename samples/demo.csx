@@ -1,9 +1,14 @@
-Require<RebusScriptBus>().Send("dc.positions.trades.input", new CalculateTrade<PowerFinancialTransaction> {TradeId = 5});
+#r "DC.Positions.Shared.dll"
 
-public class CalculateTrade<T>
-{
-        public int TradeId { get; set; }
-}
+//using DC.Positions.Shared.Entities;
+//using DC.Positions.Shared.Messages;
 
-public class PowerFinancialTransaction
-{}
+//Require<RebusScriptBus>().Send("dc.positions.trades.input", new CalculateTrade<PowerFinancialTransaction> {TradeId = 5});
+
+//public class CalculateTrade<T>
+//{
+//        public int TradeId { get; set; }
+//}
+
+//public class PowerFinancialTransaction
+//{}
