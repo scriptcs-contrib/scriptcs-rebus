@@ -3,6 +3,7 @@ using Rebus;
 using Rebus.Bus;
 using Rebus.Configuration;
 using Rebus.Logging;
+using Rebus.Serialization.Json;
 using Rebus.Transports.Msmq;
 using ScriptCs.Contracts;
 
@@ -21,7 +22,7 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("destination", destination);
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-            ConfigureRebus();
+            ConfigureRebus(message.GetType().FullName, message.GetType().Assembly.FullName);
 
             Guard.AgainstNullArgument("_bus", _bus);
 
@@ -32,11 +33,14 @@ namespace ScriptCs.Rebus
             ShutDown();
         }
 
-        private void ConfigureRebus()
+        private void ConfigureRebus(string typeName, string assemblyName)
         {
             _bus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(configurer => configurer.None())
                 .Transport(configurer => configurer.UseMsmqInOneWayClientMode() /*configurer.UseMsmq("ScriptCs.Rebus.Input", "ScriptCs.Rebus.Error")*/)
+                .Serialization(configurer => configurer.UseJsonSerializer()
+                    .AddNameResolver(type => new TypeDescriptor(assemblyName, typeName))
+                    .AddTypeResolver(descriptor => null))
                 .CreateBus()
                 .Start();
         }
