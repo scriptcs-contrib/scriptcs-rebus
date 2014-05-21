@@ -5,5 +5,6 @@
 
 Require<RebusScriptBus>()
 	.ConfigureBus("MyMessageQueue")
-	.Receive<Message>(x => Console.WriteLine(x.Content))
+	.Receive<string>(x => Console.WriteLine(x))
+//	.Receive<Message>(x => Console.WriteLine(x.Content))
 	.Start();

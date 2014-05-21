@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Messaging;
@@ -54,11 +55,9 @@ namespace ScriptCs.Rebus
 
         public RebusScriptBus Receive<T>(Action<T> f) where T : class
         {
-            Console.WriteLine(typeof(T).Name);
-            knownTypes[typeof (T).Name] = typeof(T);
-            _builtinContainerAdapter.Register(() => new MessageReceiver<T>(f));
+            knownTypes[typeof(T).Name] = typeof(T);
+            _builtinContainerAdapter.Register(() => new MessageReceiver<T>(_queue, f));
 
-            Console.WriteLine("Awaiting messages of type {0}", typeof(T).Name);
 
             return this;
         }
@@ -70,16 +69,14 @@ namespace ScriptCs.Rebus
 
         private void ConfigureSendBus<T>(string destination) where T : class
         {
-            Console.WriteLine(typeof(T).Assembly.FullName);
-
             _typeDescriptor = new TypeDescriptor("ScriptCs.Compiled", typeof(T).Name);
 
             CreateQueue(destination);
+
             _sendBus = Configure.With(_builtinContainerAdapter)
                 .Logging(configurer => configurer.None())
                 .Serialization(serializer => serializer.UseJsonSerializer()
-                    //.AddTypeResolver(x => Assembly.GetExecutingAssembly().GetType("pingo" + "." + typeof(T).Name))
-                    .AddNameResolver(x => new TypeDescriptor("ScriptCs.Compiled", x.Name)))
+                    .AddNameResolver(x => x.Assembly.GetName().Name.Contains("-#1") ? new TypeDescriptor("ScriptCs.Compiled", x.Name) : null))
                 .Transport(configurer => configurer.UseMsmq(destination, string.Format("{0}.error", destination)))
                 .CreateBus()
                 .Start();
@@ -104,37 +101,33 @@ namespace ScriptCs.Rebus
         
         private void ConfigureReceiveBus()
         {
-
             var receivingBus = Configure.With(_builtinContainerAdapter)
                 .Logging(configurer => configurer.None())
                 .Serialization(serializer => serializer.UseJsonSerializer()
-                    //.AddNameResolver(x => _typeDescriptor)
-                    .AddTypeResolver(x =>
-                    {
-                        Console.WriteLine(x.TypeName);
-                        var type = x.AssemblyName == "ScriptCs.Compiled" ? knownTypes[x.TypeName] : typeof (string);
-                        return type;
-                    }))
+                    .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? knownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
                 .CreateBus()
                 .Start();
-
-            //receivingBus.Advanced.Routing.Subscribe<T>(inputQueue);
-        }
-
-        internal class MessageReceiver<T> : IHandleMessages<T> where T : class
-        {
-            private readonly Action<T> _f;
-
-            public MessageReceiver(Action<T> f)
-            {
-                _f = f;
-            }
-
-            public void Handle(T message)
-            {
-                _f(message);
-            }
         }
     }
+
+    internal class MessageReceiver<T> : IHandleMessages<T> where T : class
+    {
+        private readonly string _queue;
+        private readonly Action<T> _f;
+
+        public MessageReceiver(string queue, Action<T> f)
+        {
+            if (queue == null) throw new ArgumentNullException("queue");
+            _queue = queue;
+            _f = f;
+        }
+
+        public void Handle(T message)
+        {
+            Console.Write("From {0} > ", _queue);
+            _f(message);
+        }
+    }
+
 }
