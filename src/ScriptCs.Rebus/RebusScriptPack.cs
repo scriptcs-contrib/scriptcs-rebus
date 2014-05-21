@@ -1,4 +1,6 @@
-﻿using ScriptCs.Contracts;
+﻿using System;
+using System.ComponentModel.Composition;
+using ScriptCs.Contracts;
 
 namespace ScriptCs.Rebus
 {
