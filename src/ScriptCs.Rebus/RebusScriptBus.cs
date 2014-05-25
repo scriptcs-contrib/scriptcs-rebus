@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 using System.Messaging;
-using System.Reflection;
-using System.Runtime.Remoting.Channels;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
@@ -20,8 +15,7 @@ namespace ScriptCs.Rebus
         private string _queue;
         private IBus _sendBus;
         private IBus _receiveBus;
-        private BuiltinContainerAdapter _builtinContainerAdapter;
-        private TypeDescriptor _typeDescriptor; 
+        private readonly BuiltinContainerAdapter _builtinContainerAdapter;
 
         public RebusScriptBus()
         {
@@ -39,10 +33,12 @@ namespace ScriptCs.Rebus
 
         public void Send<T>(T message) where T : class
         {
-            Guard.AgainstNullArgument("destination", _queue);
             Guard.AgainstNullArgumentIfNullable("message", message);
-                
-            ConfigureSendBus<T>(_queue);
+
+            if (_sendBus == null)
+            {
+                ConfigureSendBus();
+            }
 
             Guard.AgainstNullArgument("_sendBus", _sendBus);
 
@@ -64,20 +60,24 @@ namespace ScriptCs.Rebus
 
         public void Start()
         {
-            ConfigureReceiveBus();
+            if (_receiveBus == null)
+            {
+                ConfigureReceiveBus();
+            }
         }
 
-        private void ConfigureSendBus<T>(string destination) where T : class
+        private void ConfigureSendBus()
         {
-            _typeDescriptor = new TypeDescriptor("ScriptCs.Compiled", typeof(T).Name);
-
-            CreateQueue(destination);
+            CreateQueue(_queue);
 
             _sendBus = Configure.With(_builtinContainerAdapter)
                 .Logging(configurer => configurer.None())
                 .Serialization(serializer => serializer.UseJsonSerializer()
-                    .AddNameResolver(x => x.Assembly.GetName().Name.Contains("-#1") ? new TypeDescriptor("ScriptCs.Compiled", x.Name) : null))
-                .Transport(configurer => configurer.UseMsmq(destination, string.Format("{0}.error", destination)))
+                    .AddNameResolver(
+                        x => x.Assembly.GetName().Name.Contains("ℛ")
+                            ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
+                            : null))
+                        .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
                 .CreateBus()
                 .Start();
         }
@@ -94,14 +94,15 @@ namespace ScriptCs.Rebus
 
         private void ShutDown()
         {
-            _sendBus.Dispose();
+            if (_sendBus != null) _sendBus.Dispose();
+            if (_receiveBus != null) _receiveBus.Dispose();
         }
-        
+
         readonly ConcurrentDictionary<string, Type> knownTypes = new ConcurrentDictionary<string, Type>();
         
         private void ConfigureReceiveBus()
         {
-            var receivingBus = Configure.With(_builtinContainerAdapter)
+            _receiveBus = Configure.With(_builtinContainerAdapter)
                 .Logging(configurer => configurer.None())
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? knownTypes[x.TypeName] : null))
