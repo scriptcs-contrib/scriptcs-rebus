@@ -70,7 +70,7 @@ namespace ScriptCs.Rebus
         {
             CreateQueue(_queue);
 
-            _sendBus = Configure.With(_builtinContainerAdapter)
+            _sendBus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(configurer => configurer.None())
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
