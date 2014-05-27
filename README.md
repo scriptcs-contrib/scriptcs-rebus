@@ -26,7 +26,7 @@ Now open another command prompt or use the same, and enter the following to rece
 
 The command prompt should output the following:
 
-    > From MyMessageQueue > My first scripted message!
+    From MyMessageQueue > My first scripted message!
 
 ## Basic usage from script
 The examples from above apply to scripts. Put the send and receive code into two `.csx` files, lets call them `send.csx` and `receive.csx`, and execute them by typing the following from a command prompt:
