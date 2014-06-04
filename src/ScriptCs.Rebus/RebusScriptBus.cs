@@ -24,7 +24,7 @@ namespace ScriptCs.Rebus
 
         public RebusScriptBus ConfigureBus(string queue)
         {
-            if (queue == null) throw new ArgumentNullException("queue");
+            Guard.AgainstNullArgument("queue", queue);
 
             _queue = queue;
 
@@ -49,11 +49,12 @@ namespace ScriptCs.Rebus
             ShutDown();
         }
 
-        public RebusScriptBus Receive<T>(Action<T> f) where T : class
+        public RebusScriptBus Receive<T>(Action<T> action) where T : class
         {
-            knownTypes[typeof(T).Name] = typeof(T);
-            _builtinContainerAdapter.Register(() => new MessageReceiver<T>(_queue, f));
+            Guard.AgainstNullArgument("action", action);
 
+            knownTypes[typeof(T).Name] = typeof(T);
+            _builtinContainerAdapter.Register(() => new MessageReceiver<T>(action));
 
             return this;
         }
@@ -64,6 +65,8 @@ namespace ScriptCs.Rebus
             {
                 ConfigureReceiveBus();
             }
+
+            Console.WriteLine("Awaiting messsage on {0}...", _queue);
         }
 
         private void ConfigureSendBus()
@@ -114,20 +117,20 @@ namespace ScriptCs.Rebus
 
     internal class MessageReceiver<T> : IHandleMessages<T> where T : class
     {
-        private readonly string _queue;
-        private readonly Action<T> _f;
+        private readonly Action<T> _action;
 
-        public MessageReceiver(string queue, Action<T> f)
+        public MessageReceiver(Action<T> action)
         {
-            if (queue == null) throw new ArgumentNullException("queue");
-            _queue = queue;
-            _f = f;
+            Guard.AgainstNullArgument("action", action);
+            
+            _action = action;
         }
 
         public void Handle(T message)
         {
-            Console.Write("From {0} > ", _queue);
-            _f(message);
+            Guard.AgainstNullArgument("message", message);
+
+            _action(message);
         }
     }
 
