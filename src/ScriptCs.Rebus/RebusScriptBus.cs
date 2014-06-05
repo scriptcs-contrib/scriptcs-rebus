@@ -4,6 +4,7 @@ using System.Messaging;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
+using Rebus.RabbitMQ;
 using Rebus.Serialization.Json;
 using Rebus.Transports.Msmq;
 using ScriptCs.Contracts;
@@ -16,6 +17,8 @@ namespace ScriptCs.Rebus
         private IBus _sendBus;
         private IBus _receiveBus;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
+        private bool _isRabbitMq = false;
+        private string _rabbitConnectionString;
 
         public RebusScriptBus()
         {
@@ -24,9 +27,21 @@ namespace ScriptCs.Rebus
 
         public RebusScriptBus ConfigureBus(string queue)
         {
-            if (queue == null) throw new ArgumentNullException("queue");
+            Guard.AgainstNullArgument("queue", queue);
 
             _queue = queue;
+
+            return this;
+        }
+
+        public RebusScriptBus ConfigureRabbitBus(string queue, string connectionString)
+        {
+            Guard.AgainstNullArgument("queue", queue);
+            Guard.AgainstNullArgument("connectionString", connectionString);
+
+            _queue = queue;
+            _rabbitConnectionString = connectionString;
+            _isRabbitMq = true;
 
             return this;
         }
@@ -68,7 +83,7 @@ namespace ScriptCs.Rebus
 
         private void ConfigureSendBus()
         {
-            CreateQueue(_queue);
+            //CreateQueue(_queue);
 
             _sendBus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(configurer => configurer.None())
