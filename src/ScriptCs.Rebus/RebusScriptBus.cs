@@ -13,11 +13,12 @@ namespace ScriptCs.Rebus
 {
     public class RebusScriptBus : IScriptPackContext
     {
+        private const string RabbitMqDefaultConnectionString = "amqp://localhost:5672";
         private string _queue;
         private IBus _sendBus;
         private IBus _receiveBus;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
-        private bool _isRabbitMq = false;
+        private bool _isRabbitMq;
         private string _rabbitConnectionString;
 
         public RebusScriptBus()
@@ -34,7 +35,7 @@ namespace ScriptCs.Rebus
             return this;
         }
 
-        public RebusScriptBus ConfigureRabbitBus(string queue, string connectionString)
+        public RebusScriptBus ConfigureRabbitBus(string queue, string connectionString = RabbitMqDefaultConnectionString)
         {
             Guard.AgainstNullArgument("queue", queue);
             Guard.AgainstNullArgument("connectionString", connectionString);
@@ -52,7 +53,14 @@ namespace ScriptCs.Rebus
 
             if (_sendBus == null)
             {
-                ConfigureSendBus();
+                if (_isRabbitMq)
+                {
+                    ConfigureRabbitSendBus();
+                }
+                else
+                {
+                    ConfigureSendBus();
+                }
             }
 
             Guard.AgainstNullArgument("_sendBus", _sendBus);
@@ -64,11 +72,12 @@ namespace ScriptCs.Rebus
             ShutDown();
         }
 
-        public RebusScriptBus Receive<T>(Action<T> f) where T : class
+        public RebusScriptBus Receive<T>(Action<T> action) where T : class
         {
-            knownTypes[typeof(T).Name] = typeof(T);
-            _builtinContainerAdapter.Register(() => new MessageReceiver<T>(_queue, f));
+            Guard.AgainstNullArgument("action", action);
 
+            knownTypes[typeof(T).Name] = typeof(T);
+            _builtinContainerAdapter.Register(() => new MessageReceiver<T>(action));
 
             return this;
         }
@@ -77,14 +86,35 @@ namespace ScriptCs.Rebus
         {
             if (_receiveBus == null)
             {
-                ConfigureReceiveBus();
+                if (_isRabbitMq)
+                {
+                    ConfigureRabbitReceiveBus();
+                }
+                else
+                {
+                    ConfigureReceiveBus();
+                }
             }
+
+            Console.WriteLine("Awaiting messsage on {0}...", _queue);
+        }
+
+        private void ConfigureRabbitSendBus()
+        {
+            _sendBus = Configure.With(new BuiltinContainerAdapter())
+                .Logging(configurer => configurer.None())
+                .Serialization(serializer => serializer.UseJsonSerializer()
+                    .AddNameResolver(
+                        x => x.Assembly.GetName().Name.Contains("ℛ")
+                            ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
+                            : null))
+                        .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
+                .CreateBus()
+                .Start();
         }
 
         private void ConfigureSendBus()
         {
-            //CreateQueue(_queue);
-
             _sendBus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(configurer => configurer.None())
                 .Serialization(serializer => serializer.UseJsonSerializer()
@@ -97,16 +127,6 @@ namespace ScriptCs.Rebus
                 .Start();
         }
 
-        private void CreateQueue(string queueName)
-        {
-            var path = string.Format(@".\private$\{0}", queueName);
-
-            if (!MessageQueue.Exists(path))
-            {
-                MessageQueue.Create(path, true);
-            }
-        }
-
         private void ShutDown()
         {
             if (_sendBus != null) _sendBus.Dispose();
@@ -114,7 +134,18 @@ namespace ScriptCs.Rebus
         }
 
         readonly ConcurrentDictionary<string, Type> knownTypes = new ConcurrentDictionary<string, Type>();
-        
+
+        private void ConfigureRabbitReceiveBus()
+        {
+            _receiveBus = Configure.With(_builtinContainerAdapter)
+                .Logging(configurer => configurer.None())
+                .Serialization(serializer => serializer.UseJsonSerializer()
+                    .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? knownTypes[x.TypeName] : null))
+                .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
+                .CreateBus()
+                .Start();
+        }
+
         private void ConfigureReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
@@ -129,20 +160,20 @@ namespace ScriptCs.Rebus
 
     internal class MessageReceiver<T> : IHandleMessages<T> where T : class
     {
-        private readonly string _queue;
-        private readonly Action<T> _f;
+        private readonly Action<T> _action;
 
-        public MessageReceiver(string queue, Action<T> f)
+        public MessageReceiver(Action<T> action)
         {
-            if (queue == null) throw new ArgumentNullException("queue");
-            _queue = queue;
-            _f = f;
+            Guard.AgainstNullArgument("action", action);
+            
+            _action = action;
         }
 
         public void Handle(T message)
         {
-            Console.Write("From {0} > ", _queue);
-            _f(message);
+            Guard.AgainstNullArgument("message", message);
+
+            _action(message);
         }
     }
 
