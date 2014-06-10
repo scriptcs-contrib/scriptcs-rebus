@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="Guard.cs" />
     <Compile Include="BaseBus.cs" />
+    <Compile Include="LoggingStrategies.cs" />
     <Compile Include="MsmqBus.cs" />
     <Compile Include="RabbitMqBus.cs" />
     <Compile Include="RebusScriptBus.cs" />

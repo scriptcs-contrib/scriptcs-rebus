@@ -11,6 +11,7 @@ namespace ScriptCs.Rebus
     {
         private readonly string _queue;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
+        private bool _useLogging = false;
 
         public MsmqBus(string queue)
         {
@@ -35,7 +36,7 @@ namespace ScriptCs.Rebus
             _sendBus.Advanced.Routing.Send(_queue, message);
             Console.WriteLine("... message sent.");
 
-            ShutDown();
+            //ShutDown();
         }
 
         public override BaseBus Receive<T>(Action<T> action)
@@ -58,16 +59,25 @@ namespace ScriptCs.Rebus
             Console.WriteLine("Awaiting messsage on {0}...", _queue);
         }
 
+        public override BaseBus UseLogging()
+        {
+            _useLogging = true;
+
+            return this;
+        }
+
         private void ConfigureSendBus()
         {
+            var loggingConfigurer = _useLogging ? (configurer => configurer.Console()) :  new Action<LoggingConfigurer>(configurer => configurer.None());
+
             _sendBus = Configure.With(new BuiltinContainerAdapter())
-                .Logging(configurer => configurer.None())
+                .Logging(loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                        .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
+                .Transport(configurer => configurer.UseMsmq(string.Format("{0}.input", _queue), string.Format("{0}.error", _queue)))
                 .CreateBus()
                 .Start();
         }
@@ -75,7 +85,7 @@ namespace ScriptCs.Rebus
         private void ConfigureReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
-                .Logging(configurer => configurer.None())
+                .Logging(configurer => configurer.Console())
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))

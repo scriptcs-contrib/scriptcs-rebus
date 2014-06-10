@@ -13,6 +13,7 @@ namespace ScriptCs.Rebus
         public abstract void Send<T>(T message) where T : class;
         public abstract BaseBus Receive<T>(Action<T> action) where T : class;
         public abstract void Start();
+        public abstract BaseBus UseLogging();
 
         protected void ShutDown()
         {
