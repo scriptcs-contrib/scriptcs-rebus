@@ -11,7 +11,7 @@ namespace ScriptCs.Rebus
     {
         private readonly string _queue;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
-        private bool _useLogging = false;
+        private Action<LoggingConfigurer> loggingConfigurer;
 
         public MsmqBus(string queue)
         {
@@ -61,15 +61,13 @@ namespace ScriptCs.Rebus
 
         public override BaseBus UseLogging()
         {
-            _useLogging = true;
+            loggingConfigurer = configurer => configurer.Console();
 
             return this;
         }
 
         private void ConfigureSendBus()
         {
-            var loggingConfigurer = _useLogging ? (configurer => configurer.Console()) :  new Action<LoggingConfigurer>(configurer => configurer.None());
-
             _sendBus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
@@ -85,7 +83,7 @@ namespace ScriptCs.Rebus
         private void ConfigureReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
-                .Logging(configurer => configurer.Console())
+                .Logging(loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))

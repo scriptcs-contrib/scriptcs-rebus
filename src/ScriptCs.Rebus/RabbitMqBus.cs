@@ -11,7 +11,8 @@ namespace ScriptCs.Rebus
         private readonly string _queue;
         private readonly string _rabbitConnectionString;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
-        private bool _useLogging = false;
+        private Action<LoggingConfigurer> loggingConfigurer;
+
 
         public RabbitMqBus(string queue, string connectionString)
         {
@@ -63,15 +64,13 @@ namespace ScriptCs.Rebus
 
         public override BaseBus UseLogging()
         {
-            _useLogging = true;
+            loggingConfigurer = configurer => configurer.Console();
 
             return this;
         }
 
         private void ConfigureRabbitSendBus()
         {
-            var loggingConfigurer = _useLogging ? (configurer => configurer.Console()) : new Action<LoggingConfigurer>(configurer => configurer.None());
-
             _sendBus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
@@ -87,7 +86,7 @@ namespace ScriptCs.Rebus
         private void ConfigureRabbitReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
-                .Logging(configurer => configurer.None())
+                .Logging(loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
