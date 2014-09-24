@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.RabbitMQ;
@@ -11,7 +13,7 @@ namespace ScriptCs.Rebus
         private readonly string _queue;
         private readonly string _rabbitConnectionString;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
-        private Action<LoggingConfigurer> loggingConfigurer;
+        private Action<LoggingConfigurer> _loggingConfigurer;
 
 
         public RabbitMqBus(string queue, string connectionString)
@@ -21,6 +23,8 @@ namespace ScriptCs.Rebus
             
             _queue = queue;
             _rabbitConnectionString = connectionString;
+            _loggingConfigurer = configurer => configurer.None();
+
             _builtinContainerAdapter = new BuiltinContainerAdapter();
         }
 
@@ -64,7 +68,7 @@ namespace ScriptCs.Rebus
 
         public override BaseBus UseLogging()
         {
-            loggingConfigurer = configurer => configurer.Console();
+            _loggingConfigurer = configurer => configurer.Console();
 
             return this;
         }
@@ -72,7 +76,7 @@ namespace ScriptCs.Rebus
         private void ConfigureRabbitSendBus()
         {
             _sendBus = Configure.With(new BuiltinContainerAdapter())
-                .Logging(loggingConfigurer)
+                .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
                         x => x.Assembly.GetName().Name.Contains("ℛ")
@@ -86,7 +90,7 @@ namespace ScriptCs.Rebus
         private void ConfigureRabbitReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
-                .Logging(loggingConfigurer)
+                .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))

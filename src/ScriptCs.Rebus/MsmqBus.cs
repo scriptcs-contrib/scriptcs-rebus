@@ -11,7 +11,7 @@ namespace ScriptCs.Rebus
     {
         private readonly string _queue;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
-        private Action<LoggingConfigurer> loggingConfigurer;
+        private Action<LoggingConfigurer> _loggingConfigurer;
 
         public MsmqBus(string queue)
         {
@@ -19,6 +19,7 @@ namespace ScriptCs.Rebus
 
             _queue = queue;
             _builtinContainerAdapter = new BuiltinContainerAdapter();
+            _loggingConfigurer = configurer => configurer.None();
         }
 
         public override void Send<T>(T message)
@@ -36,7 +37,7 @@ namespace ScriptCs.Rebus
             _sendBus.Advanced.Routing.Send(_queue, message);
             Console.WriteLine("... message sent.");
 
-            //ShutDown();
+            ShutDown();
         }
 
         public override BaseBus Receive<T>(Action<T> action)
@@ -61,7 +62,7 @@ namespace ScriptCs.Rebus
 
         public override BaseBus UseLogging()
         {
-            loggingConfigurer = configurer => configurer.Console();
+            _loggingConfigurer = configurer => configurer.Console();
 
             return this;
         }
@@ -69,7 +70,7 @@ namespace ScriptCs.Rebus
         private void ConfigureSendBus()
         {
             _sendBus = Configure.With(new BuiltinContainerAdapter())
-                .Logging(loggingConfigurer)
+                .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
                         x => x.Assembly.GetName().Name.Contains("ℛ")
@@ -83,7 +84,7 @@ namespace ScriptCs.Rebus
         private void ConfigureReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
-                .Logging(loggingConfigurer)
+                .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
