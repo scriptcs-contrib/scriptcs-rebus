@@ -6,7 +6,7 @@ using Rebus.Logging;
 using Rebus.RabbitMQ;
 using Rebus.Serialization.Json;
 
-namespace ScriptCs.Rebus
+namespace ScriptCs.Rebus.RabbitMQ
 {
     public class RabbitMqBus : BaseBus
     {
@@ -32,10 +32,12 @@ namespace ScriptCs.Rebus
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
+
             if (_sendBus == null)
             {
                 ConfigureRabbitSendBus();
             }
+            Console.WriteLine("In Send. Message: " + message);
 
             Guard.AgainstNullArgument("_sendBus", _sendBus);
 
