@@ -4,7 +4,7 @@ using Rebus.Logging;
 using Rebus.RabbitMQ;
 using Rebus.Serialization.Json;
 
-namespace ScriptCs.Rebus
+namespace ScriptCs.Rebus.RabbitMQ
 {
     public class RabbitMqBus : BaseBus
     {
@@ -28,10 +28,12 @@ namespace ScriptCs.Rebus
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
+
             if (_sendBus == null)
             {
                 ConfigureRabbitSendBus();
             }
+            Console.WriteLine("In Send. Message: " + message);
 
             Guard.AgainstNullArgument("_sendBus", _sendBus);
 
@@ -71,16 +73,24 @@ namespace ScriptCs.Rebus
 
         private void ConfigureRabbitSendBus()
         {
-            _sendBus = Configure.With(new BuiltinContainerAdapter())
-                .Logging(loggingConfigurer)
-                .Serialization(serializer => serializer.UseJsonSerializer()
-                    .AddNameResolver(
-                        x => x.Assembly.GetName().Name.Contains("ℛ")
-                            ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
-                            : null))
-                        .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
-                .CreateBus()
-                .Start();
+            Console.WriteLine("In ConfigureSendBus.");
+            try
+            {
+                _sendBus = Configure.With(new BuiltinContainerAdapter())
+                    .Logging(loggingConfigurer)
+                    .Serialization(serializer => serializer.UseJsonSerializer()
+                        .AddNameResolver(
+                            x => x.Assembly.GetName().Name.Contains("ℛ")
+                                ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
+                                : null))
+                    .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
+                    .CreateBus()
+                    .Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private void ConfigureRabbitReceiveBus()
