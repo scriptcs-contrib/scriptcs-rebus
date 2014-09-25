@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>ScriptCs.Rebus.RabbitMQ</id>
+    <id>ScriptCs.Rebus.AzureServiceBus</id>
     <version>0.3.0</version>
-    <title>ScriptCs.Rebus.RabbitMQ</title>
+    <title>ScriptCs.Rebus.AzureServiceBus</title>
     <authors>Mads Tjørnelund Toustrup</authors>
     <projectUrl>https://github.com/madstt/ScriptCs.Rebus</projectUrl>
-    <description>An extension to ScriptCs.Rebus for using RabbitMQ as transport mechanism.</description>
+    <description>An extension to ScriptCs.Rebus for using Azure Service Bus as transport mechanism.</description>
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
     <dependencies>
       <dependency id="ScriptCs.Rebus" version="0.3.0" />
-      <dependency id="Rebus.RabbitMQ" version="0.71.1" />
+      <dependency id="Rebus.AzureServiceBus" version="0.71.1" />
     </dependencies>
-    <tags>scriptcs rebus scriptpack messaging rabbitmq</tags>
+    <tags>scriptcs rebus scriptpack messaging azure servicebus</tags>
   </metadata>
 </package>
