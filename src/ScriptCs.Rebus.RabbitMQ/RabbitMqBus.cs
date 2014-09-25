@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.RabbitMQ;
@@ -11,7 +13,7 @@ namespace ScriptCs.Rebus.RabbitMQ
         private readonly string _queue;
         private readonly string _rabbitConnectionString;
         private readonly BuiltinContainerAdapter _builtinContainerAdapter;
-        private Action<LoggingConfigurer> loggingConfigurer;
+        private Action<LoggingConfigurer> _loggingConfigurer;
 
 
         public RabbitMqBus(string queue, string connectionString)
@@ -21,6 +23,8 @@ namespace ScriptCs.Rebus.RabbitMQ
             
             _queue = queue;
             _rabbitConnectionString = connectionString;
+            _loggingConfigurer = configurer => configurer.None();
+
             _builtinContainerAdapter = new BuiltinContainerAdapter();
         }
 
@@ -66,37 +70,29 @@ namespace ScriptCs.Rebus.RabbitMQ
 
         public override BaseBus UseLogging()
         {
-            loggingConfigurer = configurer => configurer.Console();
+            _loggingConfigurer = configurer => configurer.Console();
 
             return this;
         }
 
         private void ConfigureRabbitSendBus()
         {
-            Console.WriteLine("In ConfigureSendBus.");
-            try
-            {
-                _sendBus = Configure.With(new BuiltinContainerAdapter())
-                    .Logging(loggingConfigurer)
-                    .Serialization(serializer => serializer.UseJsonSerializer()
-                        .AddNameResolver(
-                            x => x.Assembly.GetName().Name.Contains("ℛ")
-                                ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
-                                : null))
-                    .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
-                    .CreateBus()
-                    .Start();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            _sendBus = Configure.With(new BuiltinContainerAdapter())
+                .Logging(_loggingConfigurer)
+                .Serialization(serializer => serializer.UseJsonSerializer()
+                    .AddNameResolver(
+                        x => x.Assembly.GetName().Name.Contains("ℛ")
+                            ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
+                            : null))
+                        .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
+                .CreateBus()
+                .Start();
         }
 
         private void ConfigureRabbitReceiveBus()
         {
             _receiveBus = Configure.With(_builtinContainerAdapter)
-                .Logging(loggingConfigurer)
+                .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))

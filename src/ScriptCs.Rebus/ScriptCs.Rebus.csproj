@@ -34,6 +34,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Rebus.0.71.1\lib\NET40\Rebus.dll</HintPath>
     </Reference>
+    <Reference Include="Rebus.RabbitMQ, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rebus.RabbitMQ.0.63.0\lib\NET40\Rebus.RabbitMQ.dll</HintPath>
+    </Reference>
     <Reference Include="ScriptCs.Contracts, Version=0.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ScriptCs.Contracts.0.10.2\lib\net45\ScriptCs.Contracts.dll</HintPath>
@@ -49,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureBus.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="BaseBus.cs" />
     <Compile Include="LoggingStrategies.cs" />
