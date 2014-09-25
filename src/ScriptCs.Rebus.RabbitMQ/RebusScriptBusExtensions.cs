@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ScriptCs.Rebus.RabbitMQ
+﻿namespace ScriptCs.Rebus.RabbitMQ
 {
     public static class RebusScriptBusExtensions
     {

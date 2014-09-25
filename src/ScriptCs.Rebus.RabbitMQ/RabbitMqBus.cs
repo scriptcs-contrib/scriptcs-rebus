@@ -32,12 +32,10 @@ namespace ScriptCs.Rebus.RabbitMQ
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-
             if (_sendBus == null)
             {
                 ConfigureRabbitSendBus();
             }
-            Console.WriteLine("In Send. Message: " + message);
 
             Guard.AgainstNullArgument("_sendBus", _sendBus);
 
