@@ -8,7 +8,6 @@ namespace ScriptCs.Rebus.RabbitMQ
 
         public static BaseBus ConfigureRabbitBus(this RebusScriptBus bus, string queue, string connectionString = RabbitMqDefaultConnectionString)
         {
-            Console.WriteLine("In Configure.");
             Guard.AgainstNullArgument("queue", queue);
             Guard.AgainstNullArgument("connectionString", connectionString);
 
