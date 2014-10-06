@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.RabbitMQ", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.AzureServiceBus", "ScriptCs.Rebus.AzureServiceBus\ScriptCs.Rebus.AzureServiceBus.csproj", "{178C9DB4-846E-41EF-AC15-9C247DBD5DEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.Hosting", "ScriptCs.Rebus.Hosting\ScriptCs.Rebus.Hosting.csproj", "{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{178C9DB4-846E-41EF-AC15-9C247DBD5DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{178C9DB4-846E-41EF-AC15-9C247DBD5DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{178C9DB4-846E-41EF-AC15-9C247DBD5DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

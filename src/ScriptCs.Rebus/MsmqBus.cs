@@ -10,8 +10,8 @@ namespace ScriptCs.Rebus
     public class MsmqBus : BaseBus
     {
         private readonly string _queue;
-        private readonly BuiltinContainerAdapter _builtinContainerAdapter;
         private Action<LoggingConfigurer> _loggingConfigurer;
+        private BuiltinContainerAdapter _builtinContainerAdapter;
 
         public MsmqBus(string queue)
         {
@@ -26,15 +26,27 @@ namespace ScriptCs.Rebus
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-            if (_sendBus == null)
+            if (SendBus == null)
             {
                 ConfigureSendBus();
             }
 
-            Guard.AgainstNullArgument("_sendBus", _sendBus);
+            Guard.AgainstNullArgument("_sendBus", SendBus);
 
             Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
-            _sendBus.Advanced.Routing.Send(_queue, message);
+            try
+            {
+                SendBus.Advanced.Routing.Send(_queue, message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                ShutDown();
+            }
+
             Console.WriteLine("... message sent.");
 
             ShutDown();
@@ -52,7 +64,7 @@ namespace ScriptCs.Rebus
 
         public override void Start()
         {
-            if (_receiveBus == null)
+            if (ReceiveBus == null)
             {
                 ConfigureReceiveBus();
             }
@@ -69,7 +81,7 @@ namespace ScriptCs.Rebus
 
         private void ConfigureSendBus()
         {
-            _sendBus = Configure.With(new BuiltinContainerAdapter())
+            SendBus = Configure.With(new BuiltinContainerAdapter())
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
@@ -83,7 +95,7 @@ namespace ScriptCs.Rebus
 
         private void ConfigureReceiveBus()
         {
-            _receiveBus = Configure.With(_builtinContainerAdapter)
+            ReceiveBus = Configure.With(_builtinContainerAdapter)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
