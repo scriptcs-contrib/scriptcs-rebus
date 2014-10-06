@@ -12,7 +12,7 @@ namespace ScriptCs.Rebus
         protected readonly ConcurrentDictionary<string, Type> KnownTypes = new ConcurrentDictionary<string, Type>();
 
         public abstract void Send<T>(T message) where T : class;
-        public abstract void SendAScript(Script script);
+        public abstract void SendAScript(string script);
         public abstract BaseBus Receive<T>(Action<T> action) where T : class;
         public abstract void Start();
         public abstract BaseBus UseLogging();

@@ -22,6 +22,11 @@ namespace ScriptCs.Rebus
             _loggingConfigurer = configurer => configurer.None();
         }
 
+        public override void SendAScript(string script)
+        {
+            Send(new Script {ScriptContent = script});
+        }
+
         public override void Send<T>(T message)
         {
             Guard.AgainstNullArgumentIfNullable("message", message);

@@ -25,6 +25,11 @@ namespace ScriptCs.Rebus.AzureServiceBus
             _builtinContainerAdapter = new BuiltinContainerAdapter();
         }
 
+        public override void SendAScript(string script)
+        {
+            Send(new Script {ScriptContent = script});
+        }
+
         public override void Send<T>(T message)
         {
             Guard.AgainstNullArgument("message", message);

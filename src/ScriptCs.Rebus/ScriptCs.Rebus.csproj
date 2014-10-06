@@ -53,7 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AzureBus.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="BaseBus.cs" />
     <Compile Include="LoggingStrategies.cs" />
