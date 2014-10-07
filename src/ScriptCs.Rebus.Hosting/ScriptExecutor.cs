@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Versioning;
+using System.Security.Cryptography;
 using Common.Logging;
 using ScriptCs.Contracts;
 
@@ -28,11 +32,11 @@ namespace ScriptCs.Rebus.Hosting
             _scriptExecutor = scriptExecutor;
         }
 
-        public void Execute(string script)
+        public void Execute(string script, string[] dependencies)
         {
             // set directory to where script is
             // required to find NuGet dependencies
-            //Environment.CurrentDirectory = Path.GetDirectoryName(script);
+            Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             // prepare NuGet dependencies, download them if required
             //var nuGetReferences = PreparePackages(
@@ -40,12 +44,20 @@ namespace ScriptCs.Rebus.Hosting
             //                                _fileSystem, _packageAssemblyResolver,
             //                                _packageInstaller, _logger.Info);
 
+            _packageInstaller.InstallPackages(PreparePackages(dependencies));
+
             // get script packs: not fully tested yet        
             var scriptPacks = _scriptPackResolver.GetPacks();
 
             // execute script from file
             _scriptExecutor.Initialize(new List<string>(), scriptPacks);
             _scriptExecutor.ExecuteScript(script);
+        }
+
+        private IEnumerable<IPackageReference> PreparePackages(string[] dependencies)
+        {
+            return from dep in dependencies
+                select new PackageReference(dep, new FrameworkName(".NETFramework,Version=v4.0"), string.Empty);
         }
 
         // prepare NuGet dependencies, download them if required
@@ -58,6 +70,8 @@ namespace ScriptCs.Rebus.Hosting
             var binDirectory = Path.Combine(workingDirectory, ScriptCs.Constants.BinFolder);
 
             var packages = packageAssemblyResolver.GetPackages(workingDirectory);
+
+            
 
             packageInstaller.InstallPackages(
                                 packages,

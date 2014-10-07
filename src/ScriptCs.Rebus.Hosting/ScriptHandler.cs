@@ -22,8 +22,7 @@ namespace ScriptCs.Rebus.Hosting
 
                     try
                     {
-                        Console.WriteLine("Before execute");
-                        executor.Execute(message.ScriptContent);
+                        executor.Execute(message.ScriptContent, message.Dependencies);
                     }
                     catch (Exception ex)
                     {

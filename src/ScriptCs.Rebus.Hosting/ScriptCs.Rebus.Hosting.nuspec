@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>ScriptCs.Rebus.Hosting</id>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <title>ScriptCs.Rebus.Hosting</title>
     <authors>Mads Tjørnelund Toustrup</authors>
     <projectUrl>https://github.com/madstt/ScriptCs.Rebus</projectUrl>
     <description>An extension to ScriptCs.Rebus for sending scripts over a bus for execution.</description>
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
     <dependencies>
-      <dependency id="ScriptCs.Rebus" version="0.3.0" />
+      <dependency id="ScriptCs.Rebus" version="0.4.0" />
     </dependencies>
     <tags>scriptcs rebus scriptpack messaging hosting</tags>
   </metadata>

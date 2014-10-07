@@ -25,9 +25,9 @@ namespace ScriptCs.Rebus.AzureServiceBus
             _builtinContainerAdapter = new BuiltinContainerAdapter();
         }
 
-        public override void SendAScript(string script)
+        public override void SendAScript(string script, params string[] dependencies)
         {
-            Send(new Script {ScriptContent = script});
+            Send(new Script {ScriptContent = script, Dependencies = dependencies});
         }
 
         public override void Send<T>(T message)
