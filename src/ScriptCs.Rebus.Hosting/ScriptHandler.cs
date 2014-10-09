@@ -2,6 +2,7 @@
 using Autofac;
 using Common.Logging;
 using Rebus;
+using ScriptCs.Contracts;
 
 namespace ScriptCs.Rebus.Hosting
 {
@@ -19,6 +20,7 @@ namespace ScriptCs.Rebus.Hosting
                 {
                     var logger = scope.Resolve<ILog>();
                     var executor = scope.Resolve<ScriptExecutor>();
+                    scope.Resolve<IInstallationProvider>().Initialize();
 
                     try
                     {
