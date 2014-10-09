@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Text;
 using Rebus;
 using Rebus.Configuration;
 
@@ -13,9 +15,11 @@ namespace ScriptCs.Rebus
         public BuiltinContainerAdapter Container;
 
         public abstract void Send<T>(T message) where T : class;
-        public abstract void SendAScript(string script, params string[] dependencies);
+
         public abstract BaseBus Receive<T>(Action<T> action) where T : class;
+
         public abstract void Start();
+
         public abstract BaseBus UseLogging();
 
         protected void ShutDown()
@@ -24,5 +28,14 @@ namespace ScriptCs.Rebus
             if (ReceiveBus != null) ReceiveBus.Dispose();
         }
 
+        public void SendAScriptFile(string scriptFile, params string[] dependencies)
+        {
+            SendAScript(File.ReadAllText(scriptFile), dependencies);
+        }
+
+        public void SendAScript(string script, params string[] dependencies)
+        {
+            Send(new Script { ScriptContent = script, Dependencies = dependencies });
+        }
     }
 }
