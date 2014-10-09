@@ -12,7 +12,6 @@ namespace ScriptCs.Rebus.RabbitMQ
     {
         private readonly string _queue;
         private readonly string _rabbitConnectionString;
-        private BuiltinContainerAdapter _builtinContainerAdapter;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
 
@@ -23,7 +22,7 @@ namespace ScriptCs.Rebus.RabbitMQ
             
             _queue = queue;
             _rabbitConnectionString = connectionString;
-            _builtinContainerAdapter = new BuiltinContainerAdapter();
+            BuiltinContainerAdapter = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
 
@@ -55,7 +54,7 @@ namespace ScriptCs.Rebus.RabbitMQ
             Guard.AgainstNullArgument("action", action);
 
             KnownTypes[typeof(T).Name] = typeof(T);
-            _builtinContainerAdapter.Handle(action);
+            BuiltinContainerAdapter.Handle(action);
 
             return this;
         }
@@ -79,7 +78,7 @@ namespace ScriptCs.Rebus.RabbitMQ
 
         private void ConfigureRabbitSendBus()
         {
-            SendBus = Configure.With(new BuiltinContainerAdapter())
+            SendBus = Configure.With(BuiltinContainerAdapter)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
@@ -93,7 +92,7 @@ namespace ScriptCs.Rebus.RabbitMQ
 
         private void ConfigureRabbitReceiveBus()
         {
-            ReceiveBus = Configure.With(_builtinContainerAdapter)
+            ReceiveBus = Configure.With(BuiltinContainerAdapter)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))

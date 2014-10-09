@@ -11,7 +11,6 @@ namespace ScriptCs.Rebus.AzureServiceBus
         private readonly string _queue;
         private readonly string _azureConnectionString;
         private Action<LoggingConfigurer> _loggingConfigurer;
-        private readonly BuiltinContainerAdapter _builtinContainerAdapter;
 
         public AzureServiceBus(string queue, string azureConnectionString)
         {
@@ -22,7 +21,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
             _azureConnectionString = azureConnectionString;
             _loggingConfigurer = configurer => configurer.None();
 
-            _builtinContainerAdapter = new BuiltinContainerAdapter();
+            BuiltinContainerAdapter = new BuiltinContainerAdapter();
         }
 
         public override void SendAScript(string script, params string[] dependencies)
@@ -53,7 +52,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
             Guard.AgainstNullArgument("action", action);
 
             KnownTypes[typeof(T).Name] = typeof(T);
-            _builtinContainerAdapter.Handle(action);
+            BuiltinContainerAdapter.Handle(action);
 
             return this;
 
@@ -78,7 +77,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
 
         private void ConfigureAzureSendBus()
         {
-            SendBus = Configure.With(new BuiltinContainerAdapter())
+            SendBus = Configure.With(BuiltinContainerAdapter)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
@@ -92,7 +91,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
 
         private void ConfigureAzureReceiveBus()
         {
-            ReceiveBus = Configure.With(_builtinContainerAdapter)
+            ReceiveBus = Configure.With(BuiltinContainerAdapter)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
