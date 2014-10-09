@@ -35,10 +35,9 @@ namespace ScriptCs.Rebus.Hosting
 
         public void Execute(string script, string[] dependencies)
         {
-            // set directory to where script is
-            // required to find NuGet dependencies
-            //Environment.CurrentDirectory = "..\\..\\..";
-            
+            // set current dicrectory, import for NuGet.
+            Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
             // prepare NuGet dependencies, download them if required
             var nuGetReferences = PreparePackages(_fileSystem, _packageAssemblyResolver,
                                             _packageInstaller, PrepareAdditionalPackages(dependencies));
@@ -48,7 +47,11 @@ namespace ScriptCs.Rebus.Hosting
 
             // execute script from file
             _scriptExecutor.Initialize(nuGetReferences, scriptPacks);
-            _scriptExecutor.ExecuteScript(script);
+            var scriptResult = _scriptExecutor.ExecuteScript(script);
+            if (scriptResult != null)
+                if (scriptResult.CompileExceptionInfo != null)
+                    if (scriptResult.CompileExceptionInfo.SourceException != null)
+                        _logger.Debug(scriptResult.CompileExceptionInfo.SourceException.Message);
         }
 
         private IEnumerable<IPackageReference> PrepareAdditionalPackages(string[] dependencies)
@@ -62,52 +65,15 @@ namespace ScriptCs.Rebus.Hosting
                                 IPackageInstaller packageInstaller, IEnumerable<IPackageReference> additionalReferences)
         {
             var workingDirectory = Environment.CurrentDirectory;
-            Console.WriteLine("Working folder: {0}",workingDirectory);
-            var binDirectory = Path.Combine(workingDirectory, fileSystem.BinFolder);
 
             var packages = packageAssemblyResolver.GetPackages(workingDirectory);
             packages = packages.Concat(additionalReferences);
-
-            Console.WriteLine("Number of packages: {0}", packages.Count());
 
             packageInstaller.InstallPackages(
                                 packages,
                                 allowPreRelease: true);
 
             return packageAssemblyResolver.GetAssemblyNames(workingDirectory);
-
-            // current implementeation of RoslynCTP required dependencies to be in 'bin' folder
-            //if (!fileSystem.DirectoryExists(binDirectory))
-            //{
-            //    fileSystem.CreateDirectory(binDirectory);
-            //}
-
-            //// copy dependencies one by one from 'packages' to 'bin'
-            //foreach (var assemblyName
-            //            in packageAssemblyResolver.GetAssemblyNames(workingDirectory))
-            //{
-            //    var assemblyFileName = Path.GetFileName(assemblyName);
-            //    var destFile = Path.Combine(binDirectory, assemblyFileName);
-
-            //    var sourceFileLastWriteTime = fileSystem.GetLastWriteTime(assemblyName);
-            //    var destFileLastWriteTime = fileSystem.GetLastWriteTime(destFile);
-
-            //    if (sourceFileLastWriteTime == destFileLastWriteTime)
-            //    {
-            //        outputCallback(string.Format("Skipped: '{0}' because it is already exists", assemblyName));
-            //    }
-            //    else
-            //    {
-            //        fileSystem.Copy(assemblyName, destFile, overwrite: true);
-
-            //        if (outputCallback != null)
-            //        {
-            //            outputCallback(string.Format("Copy: '{0}' to '{1}'", assemblyName, destFile));
-            //        }
-            //    }
-
-            //    yield return destFile;
-            //}
         }
 
     }

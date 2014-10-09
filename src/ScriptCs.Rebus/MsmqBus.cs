@@ -93,7 +93,7 @@ namespace ScriptCs.Rebus
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                .Transport(configurer => configurer.UseMsmq(string.Format("{0}.input", _queue), string.Format("{0}.error", _queue)))
+                .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
                 .CreateBus()
                 .Start();
         }
