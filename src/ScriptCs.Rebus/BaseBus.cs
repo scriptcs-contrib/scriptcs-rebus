@@ -10,7 +10,7 @@ namespace ScriptCs.Rebus
         protected IBus SendBus;
         protected IBus ReceiveBus;
         protected readonly ConcurrentDictionary<string, Type> KnownTypes = new ConcurrentDictionary<string, Type>();
-        public BuiltinContainerAdapter BuiltinContainerAdapter;
+        public BuiltinContainerAdapter Container;
 
         public abstract void Send<T>(T message) where T : class;
         public abstract void SendAScript(string script, params string[] dependencies);

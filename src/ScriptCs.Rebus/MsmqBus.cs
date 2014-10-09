@@ -17,7 +17,7 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("queue", queue);
 
             _queue = queue;
-            BuiltinContainerAdapter = new BuiltinContainerAdapter();
+            Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
 
@@ -61,7 +61,7 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("action", action);
 
             KnownTypes[typeof(T).Name] = typeof(T);
-            BuiltinContainerAdapter.Handle(action);
+            Container.Handle(action);
 
             return this;
         }
@@ -85,7 +85,7 @@ namespace ScriptCs.Rebus
 
         private void ConfigureSendBus()
         {
-            SendBus = Configure.With(BuiltinContainerAdapter)
+            SendBus = Configure.With(Container)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
@@ -99,7 +99,7 @@ namespace ScriptCs.Rebus
 
         private void ConfigureReceiveBus()
         {
-            ReceiveBus = Configure.With(BuiltinContainerAdapter)
+            ReceiveBus = Configure.With(Container)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
