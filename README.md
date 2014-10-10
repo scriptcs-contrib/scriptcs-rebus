@@ -2,6 +2,8 @@
 
 ## What is it?
 
+**NOTE: From version 0.4.0, the RabbitMQ transport option is in a separate dependency, see Using RabbitMQ below.**
+
 A [ScriptCs](https://github.com/scriptcs/scriptcs) script pack for [Rebus](https://github.com/rebus-org/Rebus).
 
 Wouldn't it just be nice if those lovely scripts of yours could talk to other scripts? You're up for a treat. With this script pack, it is possible to write scripts that can communicate via messaging to other scripts.
