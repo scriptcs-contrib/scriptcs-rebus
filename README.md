@@ -34,7 +34,12 @@ The command prompt should output the following:
     > My first scripted message!
 
 ### Using RabbitMQ
-By default ScriptCs.Rebus uses MSMQ as transport layer, but it is possible to use RabbitMQ instead. This is done by configuring the bus like this:
+By default ScriptCs.Rebus uses MSMQ as transport layer, but it is possible to use RabbitMQ instead. Using RabbitMQ requires a separate dependency:
+
+    scriptcs -install ScriptCs.Rebus.RabbitMQ
+
+
+Then configure the bus like this:
     
     Require<RebusScriptBus>()
 		.ConfigureRabbitBus("MyMessageQueue")
@@ -45,6 +50,28 @@ This would use a local RabbitMQ instance and the default RabbitMQ port, `ampq://
     Require<RebusScriptBus>()
 		.ConfigureRabbitBus("MyMessageQueue", "ampq://remoteserver")
 		.Send<string>("Message from RabbitMQ")
+
+Receiving messages over RabbitMQ, is similar to MSMQ, with the same exceptions as sending, i.e.:
+
+	    Require<RebusScriptBus>()
+		.ConfigureRabbitBus("MyMessageQueue", "ampq://remoteserver")
+		.Receive<string>(x => Console.WriteLine(x))
+		.Start()
+
+### Using Azure Service Bus
+The third, and last option, is to use the Azure Service Bus as transport layer. Like the RabbitMQ option, the Azure Service Bus option requires a separate dependency:
+
+    scriptcs -install ScriptCs.Rebus.AzureServiceBus
+
+Configuration is similar to MSMQ and RabbitMQ, with a few exceptions:
+
+    Require<RebusScriptBus>()
+		.ConfigureAzureBus("MyMessageQueue", "Endpoint=sb://someConnectionString")
+		.Send<string>("Message from Azure Service Bus")
+
+Receiving messages is similar to MSMQ and RabbitMQ.
+
+To use the Azure Service Bus option you are required to create an Azure Service Bus yourself. ScriptCs.Rebus will create the queue.
 
 ## Basic Usage from Script
 The examples from above apply to scripts. Put the send and receive code into two `.csx` files, lets call them `send.csx` and `receive.csx`, and execute them by typing the following from a command prompt:
