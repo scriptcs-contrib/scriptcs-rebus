@@ -28,14 +28,16 @@ namespace ScriptCs.Rebus
             if (ReceiveBus != null) ReceiveBus.Dispose();
         }
 
-        public void SendAScriptFile(string scriptFile, params string[] dependencies)
+        public ScriptConfiguration SendAScriptFile(string scriptFile)
         {
-            SendAScript(File.ReadAllText(scriptFile), dependencies);
+            //SendAScript(File.ReadAllText(scriptFile), namespaceName, dependencies);
+            return new ScriptConfiguration(File.ReadAllText(scriptFile));
         }
 
-        public void SendAScript(string script, params string[] dependencies)
+        public ScriptConfiguration SendAScript(string script)
         {
-            Send(new Script { ScriptContent = script, Dependencies = dependencies });
+            //Send(new Script { ScriptContent = script, Namespaces = namespaceName, Dependencies = dependencies });
+            return new ScriptConfiguration(script);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace ScriptCs.Rebus.Hosting
             // prepare NuGet dependencies, download them if required
             var nuGetReferences = PreparePackages(_fileSystem, _packageAssemblyResolver,
                                             _packageInstaller, PrepareAdditionalPackages(dependencies));
-            
+
             // get script packs: not fully tested yet        
             var scriptPacks = _scriptPackResolver.GetPacks();
 

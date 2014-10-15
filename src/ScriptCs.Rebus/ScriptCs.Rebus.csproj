@@ -61,6 +61,7 @@
     <Compile Include="RebusScriptPack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script.cs" />
+    <Compile Include="ScriptConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
