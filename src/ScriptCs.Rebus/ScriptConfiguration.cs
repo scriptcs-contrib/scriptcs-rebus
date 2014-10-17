@@ -7,7 +7,8 @@ namespace ScriptCs.Rebus
         private readonly string _script;
         private List<string> _namespaces;
         private List<string> _nugetDependencies;
-        
+        private List<string> _localDependencies;
+
         public ScriptConfiguration(string script)
         {
             _script = script;
@@ -24,6 +25,12 @@ namespace ScriptCs.Rebus
         public ScriptConfiguration AddFromNuGet(string nugetDependency)
         {
             _nugetDependencies.Add(nugetDependency);
+            return this;
+        }
+
+        public ScriptConfiguration AddLocal(string localDependency)
+        {
+            _localDependencies.Add(localDependency);
             return this;
         }
     }
