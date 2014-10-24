@@ -1,8 +1,13 @@
 ﻿using System;
 using Autofac;
+using Autofac.Core.Registration;
 using Common.Logging;
+using Common.Logging.Simple;
 using Rebus;
 using ScriptCs.Contracts;
+using ScriptCs.Engine.Mono;
+using ScriptCs.Hosting;
+using ScriptCs.Rebus;
 
 namespace ScriptCs.Rebus.Hosting
 {
@@ -10,29 +15,8 @@ namespace ScriptCs.Rebus.Hosting
     {
         public void Handle(Script message)
         {
-            var builder = new ContainerBuilder();
-
-            builder.RegisterModule(new ScriptModule());
-
-            using (var container = builder.Build())
-            {
-                using (var scope = container.BeginLifetimeScope())
-                {
-                    var logger = scope.Resolve<ILog>();
-                    var executor = scope.Resolve<ScriptExecutor>();
-                    scope.Resolve<IInstallationProvider>().Initialize();
-
-                    try
-                    {
-                        executor.Execute(message.ScriptContent, message.Dependencies);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(ex);
-                        throw;
-                    }
-                }
-            }
+            var executor = new ScriptExecutor();
+            executor.Execute(message);
         }
     }
 }

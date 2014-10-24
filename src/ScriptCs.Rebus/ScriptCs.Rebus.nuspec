@@ -2,12 +2,12 @@
 <package >
   <metadata>
     <id>ScriptCs.Rebus</id>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
     <title>ScriptCs.Rebus</title>
     <authors>Mads Tjørnelund Toustrup</authors>
     <projectUrl>https://github.com/madstt/ScriptCs.Rebus</projectUrl>
     <description>A ScriptCs script pack for Rebus.</description>
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
-    <tags>scriptcs rebus script pack messaging msmq rabbitmq</tags>
+    <tags>scriptcs rebus script pack messaging msmq</tags>
   </metadata>
 </package>
