@@ -4,14 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
+using Common.Logging.Simple;
 using ICSharpCode.NRefactory.CSharp.Refactoring;
 using ScriptCs.Contracts;
 using Common.Logging;
 using ScriptCs.Engine.Mono;
 using ScriptCs.Engine.Roslyn;
 using ScriptCs.Hosting;
+using ScriptCs.Hosting.Package;
 using LogLevel = ScriptCs.Contracts.LogLevel;
 
 namespace ScriptCs.Rebus.Hosting
@@ -26,10 +29,11 @@ namespace ScriptCs.Rebus.Hosting
             var services = CreateScriptServices(script.UseMono, script.UseLogging);
             var scriptExecutor = services.Executor;
             var scriptPackResolver = services.ScriptPackResolver;
+            services.InstallationProvider.Initialize();
 
             // prepare NuGet dependencies, download them if required
             var assemblyPaths = PreparePackages(services.PackageAssemblyResolver,
-                                            services.PackageInstaller, PrepareAdditionalPackages(script.NuGetDependencies), script.LocalDependencies);
+                services.PackageInstaller, PrepareAdditionalPackages(script.NuGetDependencies), script.LocalDependencies, services.Logger);
 
             scriptExecutor.Initialize(assemblyPaths, scriptPackResolver.GetPacks());
             scriptExecutor.ImportNamespaces(script.Namespaces);
@@ -51,7 +55,7 @@ namespace ScriptCs.Rebus.Hosting
         }
 
         // prepare NuGet dependencies, download them if required
-        private static IEnumerable<string> PreparePackages(IPackageAssemblyResolver packageAssemblyResolver, IPackageInstaller packageInstaller, IEnumerable<IPackageReference> additionalNuGetReferences, IEnumerable<string> localDependencies)
+        private static IEnumerable<string> PreparePackages(IPackageAssemblyResolver packageAssemblyResolver, IPackageInstaller packageInstaller, IEnumerable<IPackageReference> additionalNuGetReferences, IEnumerable<string> localDependencies, ILog logger)
         {
             var workingDirectory = Environment.CurrentDirectory;
             //var locals = localDependencies.Select(localDependency => Path.Combine(workingDirectory, localDependency)).ToList();
@@ -59,9 +63,15 @@ namespace ScriptCs.Rebus.Hosting
             var packages = packageAssemblyResolver.GetPackages(workingDirectory);
             packages = packages.Concat(additionalNuGetReferences);
 
-            packageInstaller.InstallPackages(
-                packages, true);
-
+            try
+            {
+                packageInstaller.InstallPackages(
+                    packages, true);
+            }
+            catch (Exception e)
+            {
+                logger.ErrorFormat("Installation failed: {0}.", e.Message);
+            }
             var assemblyNames = packageAssemblyResolver.GetAssemblyNames(workingDirectory);
             assemblyNames = assemblyNames.Concat(localDependencies);
             return assemblyNames;
@@ -99,4 +109,6 @@ namespace ScriptCs.Rebus.Hosting
             get { return AppDomain.CurrentDomain.BaseDirectory; }
         }
     }
+
+
 }

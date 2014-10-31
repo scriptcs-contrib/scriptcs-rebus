@@ -2,9 +2,7 @@
 using Common.Logging;
 using Common.Logging.Simple;
 using NuGet;
-using ScriptCs.Contracts;
 using ScriptCs.Engine.Roslyn;
-using ScriptCs.Hosting.Package;
 using IFileSystem = ScriptCs.Contracts.IFileSystem;
 
 namespace ScriptCs.Rebus.Hosting

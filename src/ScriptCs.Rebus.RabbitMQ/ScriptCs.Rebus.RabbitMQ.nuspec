@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>ScriptCs.Rebus.RabbitMQ</id>
-    <version>0.4.0</version>
+    <version>0.5.0-beta-2</version>
     <title>ScriptCs.Rebus.RabbitMQ</title>
     <authors>Mads Tjørnelund Toustrup</authors>
     <projectUrl>https://github.com/madstt/ScriptCs.Rebus</projectUrl>
     <description>An extension to ScriptCs.Rebus for using RabbitMQ as transport mechanism.</description>
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
     <dependencies>
-      <dependency id="ScriptCs.Rebus" version="0.4.0" />
+      <dependency id="ScriptCs.Rebus" version="0.5.0-beta-2" />
       <dependency id="Rebus.RabbitMQ" version="0.71.1" />
     </dependencies>
     <tags>scriptcs rebus scriptpack messaging rabbitmq</tags>
