@@ -53,7 +53,7 @@ namespace ScriptCs.Rebus
             return this;
         }
 
-        public BaseBus Send()
+        public void Send()
         {
             _baseBus.Send(new Script
             {
@@ -64,7 +64,6 @@ namespace ScriptCs.Rebus
                 UseMono = _useMono,
                 UseLogging = _useLogging
             });
-            return _baseBus;
         }
     }
 }
