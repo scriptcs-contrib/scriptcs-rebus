@@ -1,4 +1,4 @@
-﻿namespace ScriptCs.Rebus.RabbitMQ
+﻿namespace ScriptCs.Rebus
 {
     public static class RebusScriptBusExtensions
     {
@@ -9,6 +9,8 @@
             Guard.AgainstNullArgument("queue", queue);
             Guard.AgainstNullArgument("connectionString", connectionString);
 
+            bus.ScriptPackSession.ImportNamespace("Rebus.RabbitMQ");
+            
             return new RabbitMqBus(queue, connectionString);
         }
     }

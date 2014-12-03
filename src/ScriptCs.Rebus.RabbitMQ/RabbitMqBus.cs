@@ -6,7 +6,7 @@ using Rebus.Logging;
 using Rebus.RabbitMQ;
 using Rebus.Serialization.Json;
 
-namespace ScriptCs.Rebus.RabbitMQ
+namespace ScriptCs.Rebus
 {
     public class RabbitMqBus : BaseBus
     {

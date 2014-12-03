@@ -4,7 +4,7 @@ using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
 
-namespace ScriptCs.Rebus.AzureServiceBus
+namespace ScriptCs.Rebus
 {
     public class AzureServiceBus : BaseBus
     {

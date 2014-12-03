@@ -1,4 +1,4 @@
-﻿namespace ScriptCs.Rebus.AzureServiceBus
+﻿namespace ScriptCs.Rebus
 {
     public static class RebusScriptBusExtensions
     {
@@ -6,6 +6,8 @@
         {
             Guard.AgainstNullArgument("queue", queue);
             Guard.AgainstNullArgument("connectionString", connectionString);
+
+            bus.ScriptPackSession.ImportNamespace("Rebus.AzureServiceBus");
 
             return new AzureServiceBus(queue, connectionString);
         }
