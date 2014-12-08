@@ -9,14 +9,12 @@ namespace ScriptCs.Rebus
 {
     public class MsmqBus : BaseBus
     {
-        private readonly string _queue;
+        private readonly string _endpoint;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
-        public MsmqBus(string queue)
+        public MsmqBus(string endpoint)
         {
-            Guard.AgainstNullArgument("queue", queue);
-
-            _queue = queue;
+            _endpoint = endpoint;
             Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
@@ -35,7 +33,7 @@ namespace ScriptCs.Rebus
             Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
             try
             {
-                SendBus.Advanced.Routing.Send(_queue, message);
+                SendBus.Advanced.Routing.Send(_endpoint, message);
             }
             catch (Exception e)
             {
@@ -68,7 +66,7 @@ namespace ScriptCs.Rebus
                 ConfigureReceiveBus();
             }
 
-            Console.WriteLine("Awaiting messsage on {0}...", _queue);
+            Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
         }
 
         public override BaseBus UseLogging()
@@ -87,7 +85,7 @@ namespace ScriptCs.Rebus
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
+                .Transport(configurer => configurer.UseMsmqInOneWayClientMode())
                 .CreateBus()
                 .Start();
         }
@@ -98,11 +96,9 @@ namespace ScriptCs.Rebus
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
-                .Transport(configurer => configurer.UseMsmq(_queue, string.Format("{0}.error", _queue)))
+                .Transport(configurer => configurer.UseMsmq(_endpoint, string.Format("{0}.error", _endpoint)))
                 .CreateBus()
                 .Start();
         }
-
-
     }
 }

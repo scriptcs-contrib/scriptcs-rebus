@@ -11,11 +11,9 @@ namespace ScriptCs.Rebus
             ScriptPackSession = session;
         }
 
-        public BaseBus ConfigureBus(string queue)
+        public BaseBus ConfigureBus(string endpoint)
         {
-            Guard.AgainstNullArgument("queue", queue);
-
-            return new MsmqBus(queue);
+            return new MsmqBus(endpoint);
         }
     }
 

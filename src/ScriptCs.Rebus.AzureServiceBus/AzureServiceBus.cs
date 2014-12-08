@@ -4,20 +4,20 @@ using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
 
-namespace ScriptCs.Rebus
+namespace ScriptCs.Rebus.AzureServiceBus
 {
     public class AzureServiceBus : BaseBus
     {
-        private readonly string _queue;
+        private readonly string _endpoint;
         private readonly string _azureConnectionString;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
-        public AzureServiceBus(string queue, string azureConnectionString)
+        public AzureServiceBus(string endpoint, string azureConnectionString)
         {
-            Guard.AgainstNullArgument("queue", queue);
+            Guard.AgainstNullArgument("endpoint", endpoint);
             Guard.AgainstNullArgument("azureConnectionString", azureConnectionString);
 
-            _queue = queue;
+            _endpoint = endpoint;
             _azureConnectionString = azureConnectionString;
             _loggingConfigurer = configurer => configurer.None();
 
@@ -36,7 +36,7 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
             Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
-            SendBus.Advanced.Routing.Send(_queue, message);
+            SendBus.Advanced.Routing.Send(_endpoint, message);
             Console.WriteLine("... message sent.");
 
             ShutDown();
@@ -60,7 +60,7 @@ namespace ScriptCs.Rebus
                 ConfigureAzureReceiveBus();
             }
 
-            Console.WriteLine("Awaiting messsage on {0}...", _queue);
+            Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
         }
 
         public override BaseBus UseLogging()
@@ -79,7 +79,7 @@ namespace ScriptCs.Rebus
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                        .Transport(configurer => configurer.UseAzureServiceBus(_azureConnectionString, _queue, string.Format("{0}.error", _queue)))
+                        .Transport(configurer => configurer.UseAzureServiceBusInOneWayClientMode(_azureConnectionString))
                 .CreateBus()
                 .Start();
         }
@@ -92,7 +92,7 @@ namespace ScriptCs.Rebus
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
                 .Transport(
                     configurer =>
-                        configurer.UseAzureServiceBus(_azureConnectionString, _queue, string.Format("{0}.error", _queue)))
+                        configurer.UseAzureServiceBus(_azureConnectionString, _endpoint, string.Format("{0}.error", _endpoint)))
                 .CreateBus()
                 .Start();
 

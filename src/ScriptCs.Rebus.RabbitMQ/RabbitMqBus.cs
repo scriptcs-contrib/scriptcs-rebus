@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.RabbitMQ;
 using Rebus.Serialization.Json;
 
-namespace ScriptCs.Rebus
+namespace ScriptCs.Rebus.RabbitMQ
 {
     public class RabbitMqBus : BaseBus
     {
-        private readonly string _queue;
+        private readonly string _endpoint;
         private readonly string _rabbitConnectionString;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
 
-        public RabbitMqBus(string queue, string connectionString)
+        public RabbitMqBus(string endpoint, string connectionString)
         {
-            Guard.AgainstNullArgument("queue", queue);
+            Guard.AgainstNullArgument("endpoint", endpoint);
             Guard.AgainstNullArgument("connectionString", connectionString);
             
-            _queue = queue;
+            _endpoint = endpoint;
             _rabbitConnectionString = connectionString;
             Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
@@ -38,7 +36,7 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
             Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
-            SendBus.Advanced.Routing.Send(_queue, message);
+            SendBus.Advanced.Routing.Send(_endpoint, message);
             Console.WriteLine("... message sent.");
 
             ShutDown();
@@ -61,7 +59,7 @@ namespace ScriptCs.Rebus
                 ConfigureRabbitReceiveBus();
             }
 
-            Console.WriteLine("Awaiting messsage on {0}...", _queue);
+            Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
         }
 
         public override BaseBus UseLogging()
@@ -80,7 +78,7 @@ namespace ScriptCs.Rebus
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                        .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
+                        .Transport(configurer => configurer.UseRabbitMqInOneWayMode(_rabbitConnectionString))
                 .CreateBus()
                 .Start();
         }
@@ -91,7 +89,7 @@ namespace ScriptCs.Rebus
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
-                .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _queue, string.Format("{0}.error", _queue)))
+                .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _endpoint, string.Format("{0}.error", _endpoint)))
                 .CreateBus()
                 .Start();
         }
