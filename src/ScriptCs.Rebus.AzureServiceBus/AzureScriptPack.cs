@@ -1,15 +1,15 @@
 ﻿using ScriptCs.Contracts;
 
-namespace ScriptCs.Rebus.RabbitMQ
+namespace ScriptCs.Rebus.AzureServiceBus
 {
-    public class RabbitScriptPack : IScriptPack
+    public class AzureScriptPack : IScriptPack
     {
         public void Initialize(IScriptPackSession session)
         {
             Guard.AgainstNullArgument("session", session);
 
-            session.ImportNamespace("Rebus.RabbitMQ");
-            session.ImportNamespace("ScriptCs.Rebus.RabbitMQ");
+            session.ImportNamespace("Rebus.AzureServiceBus");
+            session.ImportNamespace("ScriptCs.Rebus.AzureServiceBus");
         }
 
         public IScriptPackContext GetContext()
@@ -19,6 +19,7 @@ namespace ScriptCs.Rebus.RabbitMQ
 
         public void Terminate()
         {
+            
         }
     }
 }

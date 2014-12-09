@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureScriptPack.cs" />
     <Compile Include="AzureServiceBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RebusScriptBusExtensions.cs" />
