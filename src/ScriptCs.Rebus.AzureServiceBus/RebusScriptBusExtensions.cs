@@ -7,8 +7,6 @@
             Guard.AgainstNullArgument("endpoint", endpoint);
             Guard.AgainstNullArgument("connectionString", connectionString);
 
-            bus.ScriptPackSession.ImportNamespace("Rebus.AzureServiceBus");
-
             return new AzureServiceBus(endpoint, connectionString);
         }
 

@@ -4,8 +4,6 @@ namespace ScriptCs.Rebus
 {
     public class RebusScriptPack : IScriptPack
     {
-        private IScriptPackSession _session;
-
         public void Initialize(IScriptPackSession session)
         {
             Guard.AgainstNullArgument("session", session);
@@ -15,13 +13,11 @@ namespace ScriptCs.Rebus
             session.ImportNamespace("Rebus.Logging");
             session.ImportNamespace("Rebus.Configuration");
             session.ImportNamespace("Rebus.Transports.Msmq");
-
-            _session = session;
         }
 
         public IScriptPackContext GetContext()
         {
-            return new RebusScriptBus(_session);
+            return new RebusScriptBus();
         }
 
         public void Terminate()

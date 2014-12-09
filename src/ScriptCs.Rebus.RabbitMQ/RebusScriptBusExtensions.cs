@@ -8,8 +8,6 @@
         {
             Guard.AgainstNullArgument("endpoint", endpoint);
             Guard.AgainstNullArgument("connectionString", connectionString);
-
-            bus.ScriptPackSession.ImportNamespace("Rebus.RabbitMQ");
             
             return new RabbitMqBus(endpoint, connectionString);
         }
