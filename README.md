@@ -6,7 +6,7 @@ A [scriptcs](https://github.com/scriptcs/scriptcs) script pack for [Rebus](https
 
 Wouldn't it just be nice if those lovely scripts of yours could talk to other scripts? You're up for a treat. With this script pack, it is possible to write scripts that can communicate via messaging to other scripts.
 
-Get it on [Nuget](https://www.nuget.org/packages/ScriptCs.Rebus).
+Get it on [NuGet](https://www.nuget.org/packages/ScriptCs.Rebus).
 
 ## Installation
 Prior to using this script pack you need to [install scriptcs](https://github.com/scriptcs/scriptcs#getting-scriptcs). Then open a command prompt as administrator. Now create a folder for the scripted messaging project. Navigate to this folder and install the Nuget package by running this command:
