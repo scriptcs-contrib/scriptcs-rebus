@@ -1,47 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Mime;
-using System.Reflection;
-using System.Runtime.Remoting.Channels;
 using System.Runtime.Versioning;
-using System.Security.Cryptography;
-using Common.Logging.Simple;
 using ICSharpCode.NRefactory.CSharp.Refactoring;
 using ScriptCs.Contracts;
 using Common.Logging;
 using ScriptCs.Engine.Mono;
 using ScriptCs.Engine.Roslyn;
 using ScriptCs.Hosting;
-using ScriptCs.Hosting.Package;
+using ScriptCs.Rebus.Scripts;
 using LogLevel = ScriptCs.Contracts.LogLevel;
 
 namespace ScriptCs.Rebus.Hosting
 {
     public class ScriptExecutor
     {
-        public void Execute(Script script)
+        public void Execute(ImmediateExecutionScript immediateExecutionScript)
         {
             //// set current dicrectory, import for NuGet.
             Environment.CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            var services = CreateScriptServices(script.UseMono, script.UseLogging);
+            var services = CreateScriptServices(immediateExecutionScript.UseMono, immediateExecutionScript.UseLogging);
             var scriptExecutor = services.Executor;
             var scriptPackResolver = services.ScriptPackResolver;
             services.InstallationProvider.Initialize();
 
             // prepare NuGet dependencies, download them if required
             var assemblyPaths = PreparePackages(services.PackageAssemblyResolver,
-                services.PackageInstaller, PrepareAdditionalPackages(script.NuGetDependencies), script.LocalDependencies, services.Logger);
+                services.PackageInstaller, PrepareAdditionalPackages(immediateExecutionScript.NuGetDependencies), immediateExecutionScript.LocalDependencies, services.Logger);
 
             scriptExecutor.Initialize(assemblyPaths, scriptPackResolver.GetPacks());
-            scriptExecutor.ImportNamespaces(script.Namespaces);
-            scriptExecutor.AddReferences(script.LocalDependencies);
+            scriptExecutor.ImportNamespaces(immediateExecutionScript.Namespaces);
+            scriptExecutor.AddReferences(immediateExecutionScript.LocalDependencies);
 
-            var scriptResult = scriptExecutor.ExecuteScript(script.ScriptContent, "");
+            var scriptResult = scriptExecutor.ExecuteScript(immediateExecutionScript.ScriptContent, "");
 
-            if (script.UseLogging && scriptResult != null)
+            if (immediateExecutionScript.UseLogging && scriptResult != null)
                 if (scriptResult.CompileExceptionInfo != null)
                     if (scriptResult.CompileExceptionInfo.SourceException != null)
                         services.Logger.Debug(scriptResult.CompileExceptionInfo.SourceException.Message);

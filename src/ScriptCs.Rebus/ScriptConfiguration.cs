@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
 {
@@ -55,7 +56,7 @@ namespace ScriptCs.Rebus
 
         public void Send()
         {
-            _baseBus.Send(new Script
+            _baseBus.Send(new ImmediateExecutionScript
             {
                 ScriptContent = _script,
                 NuGetDependencies = _nugetDependencies.ToArray(),
