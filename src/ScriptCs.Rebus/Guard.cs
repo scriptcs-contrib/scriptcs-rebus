@@ -13,7 +13,7 @@ namespace ScriptCs.Rebus
         /// Guards against a null argument.
         /// </summary>
         /// <typeparam name="TArgument">The type of the argument.</typeparam>
-        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="parameterName">ControllerName of the parameter.</param>
         /// <param name="argument">The argument.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="argument" /> is <c>null</c>.</exception>
         /// <remarks><typeparamref name="TArgument"/> is restricted to reference types to avoid boxing of value type objects.</remarks>
@@ -30,7 +30,7 @@ namespace ScriptCs.Rebus
         /// Guards against a null argument if <typeparamref name="TArgument" /> can be <c>null</c>.
         /// </summary>
         /// <typeparam name="TArgument">The type of the argument.</typeparam>
-        /// <param name="parameterName">Name of the parameter.</param>
+        /// <param name="parameterName">ControllerName of the parameter.</param>
         /// <param name="argument">The argument.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="argument" /> is <c>null</c>.</exception>
         /// <remarks>
@@ -49,8 +49,8 @@ namespace ScriptCs.Rebus
         /// Guards against a null argument property value.
         /// </summary>
         /// <typeparam name="TProperty">The type of the property.</typeparam>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="parameterName">ControllerName of the parameter.</param>
+        /// <param name="propertyName">ControllerName of the property.</param>
         /// <param name="argumentProperty">The argument property.</param>
         /// <exception cref="System.ArgumentException"><paramref name="argumentProperty" /> is <c>null</c>.</exception>
         /// <remarks><typeparamref name="TProperty"/> is restricted to reference types to avoid boxing of value type objects.</remarks>
@@ -68,8 +68,8 @@ namespace ScriptCs.Rebus
         /// Guards against a null argument property value if <typeparamref name="TProperty"/> can be <c>null</c>.
         /// </summary>
         /// <typeparam name="TProperty">The type of the property.</typeparam>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="parameterName">ControllerName of the parameter.</param>
+        /// <param name="propertyName">ControllerName of the property.</param>
         /// <param name="argumentProperty">The argument property.</param>
         /// <exception cref="System.ArgumentException"><paramref name="argumentProperty" /> is <c>null</c>.</exception>
         /// <remarks>

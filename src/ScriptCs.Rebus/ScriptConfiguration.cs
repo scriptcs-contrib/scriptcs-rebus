@@ -56,7 +56,7 @@ namespace ScriptCs.Rebus
 
         public void Send()
         {
-            _baseBus.Send(new ImmediateExecutionScript
+            _baseBus.Send(new DefaultExecutionScript
             {
                 ScriptContent = _script,
                 NuGetDependencies = _nugetDependencies.ToArray(),

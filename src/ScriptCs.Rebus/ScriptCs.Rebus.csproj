@@ -61,7 +61,7 @@
     <Compile Include="RebusScriptPack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptConfiguration.cs" />
-    <Compile Include="Scripts\ImmediateExecutionScript.cs" />
+    <Compile Include="Scripts\DefaultExecutionScript.cs" />
     <Compile Include="Scripts\WebApiControllerScript.cs" />
   </ItemGroup>
   <ItemGroup>

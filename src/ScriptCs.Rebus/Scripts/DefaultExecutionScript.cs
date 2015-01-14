@@ -1,6 +1,6 @@
 namespace ScriptCs.Rebus.Scripts
 {
-    public class ImmediateExecutionScript
+    public class DefaultExecutionScript
     {
         public string ScriptContent { get; set; }
         public bool UseMono { get; set; }

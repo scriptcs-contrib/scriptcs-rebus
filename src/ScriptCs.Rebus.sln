@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus", "ScriptCs.Rebus\ScriptCs.Rebus.csproj", "{C4750F62-B63A-4E4E-8101-5CC65237EF91}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.AzureServiceBus", "ScriptCs.Rebus.AzureServiceBus\ScriptCs.Rebus.AzureServiceBus.csproj", "{178C9DB4-846E-41EF-AC15-9C247DBD5DEE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.Hosting", "ScriptCs.Rebus.Hosting\ScriptCs.Rebus.Hosting.csproj", "{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9D89CCDF-42AD-4F52-849D-9BEA64957009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
