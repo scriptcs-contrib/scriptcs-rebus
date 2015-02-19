@@ -71,7 +71,7 @@ Configuration is similar to MSMQ and RabbitMQ, with a few exceptions:
 
 Receiving messages is similar to MSMQ and RabbitMQ.
 
-To use the Azure Service Bus option you are required to create an Azure Service Bus yourself. scriptCs.rebus will create the queue.
+To use the Azure Service Bus option you are required to create an Azure Service Bus in the Azure management portal yourself. scriptCs.rebus will create the queue.
 
 ## Basic Usage from Script
 The examples from above apply to scripts. Put the send and receive code into two `.csx` files, lets call them `send.csx` and `receive.csx`, and execute them by typing the following from a command prompt:
