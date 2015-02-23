@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>ScriptCs.Rebus</id>
     <version>0.6.0</version>
     <title>ScriptCs.Rebus</title>
     <authors>Mads Tjørnelund Toustrup</authors>
+    <owners>Mads Tjørnelund Toustrup</owners>
     <projectUrl>https://github.com/madstt/ScriptCs.Rebus</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A ScriptCs script pack for Rebus.</description>
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
     <tags>scriptcs rebus script pack messaging msmq</tags>
+    <dependencies>
+      <dependency id="Rebus" version="0.77.0" />
+      <dependency id="ScriptCs.Contracts" version="0.12.0" />
+    </dependencies>
   </metadata>
 </package>

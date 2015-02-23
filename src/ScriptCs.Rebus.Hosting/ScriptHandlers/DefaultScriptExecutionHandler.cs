@@ -7,8 +7,9 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers
     {
         public void Handle(DefaultExecutionScript message)
         {
-	        var executor = new ScriptExecutor(message);
-			executor.Execute();
+			ScriptExecutor.Init(message);
+
+			ScriptExecutor.ExecuteScript();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace ScriptCs.Rebus.Hosting
 	{
 		public override string BinFolder
 		{
-			get { return AppDomain.CurrentDomain.BaseDirectory; }
+			get { return string.Empty; }
 		}
 	}
 }

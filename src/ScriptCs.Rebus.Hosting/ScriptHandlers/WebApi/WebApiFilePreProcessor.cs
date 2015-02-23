@@ -12,13 +12,15 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 	{
 		private readonly IFileSystem _fileSystem;
 		private List<string> _sharedCode = new List<string>();
-		private IList<Func<string, ScriptClass>> _classStrategies;
+		private IList<Func<string, ScriptClass>> _classStrategies = new List<Func<string, ScriptClass>>();
 
 		public WebApiFilePreProcessor(IFileSystem fileSystem, ILog logger, IEnumerable<ILineProcessor> lineProcessors)
 			: base(fileSystem, logger, lineProcessors)
 		{
 			_fileSystem = fileSystem;
 			_classStrategies.Add(ControllerStategy);
+			Directory.CreateDirectory(
+				Path.Combine(HttpContext.Current.Server.MapPath("bin"), "Shared"));
 			LoadSharedCode(Path.Combine(HttpContext.Current.Server.MapPath("bin"), "Shared"));
 		}
 
@@ -55,7 +57,8 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 
 		public override void ParseScript(List<string> scriptLines, FileParserContext context)
 		{
-			//hack: need to change this to reference a shared binary
+			//TODO: something fishy...
+
 			scriptLines.AddRange(_sharedCode);
 			var scriptClass = GetScriptClassFromScript(Path.GetFileName(context.LoadedScripts.First()));
 			base.ParseScript(scriptLines, context);

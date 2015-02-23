@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.Hosting", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9D89CCDF-42AD-4F52-849D-9BEA64957009}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Rebus.Test", "ScriptCs.Rebus.Test\ScriptCs.Rebus.Test.csproj", "{1B450A6F-B3F9-4ECC-B800-7F3D51BCC431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59CEAB43-F8E0-4CD7-A25D-7FA7F5AFE680}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B450A6F-B3F9-4ECC-B800-7F3D51BCC431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B450A6F-B3F9-4ECC-B800-7F3D51BCC431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B450A6F-B3F9-4ECC-B800-7F3D51BCC431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B450A6F-B3F9-4ECC-B800-7F3D51BCC431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
