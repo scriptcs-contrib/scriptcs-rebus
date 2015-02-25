@@ -50,7 +50,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 				}
 
 				// Add existing controllers
-				var entryAssembly = Assembly.GetEntryAssembly();
+				var entryAssembly = Assembly.GetCallingAssembly();
 				var existingControllers = entryAssembly.GetTypes()
 					.Where(x => typeof(IHttpController).IsAssignableFrom(x))
 					.ToList();
