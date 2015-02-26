@@ -68,9 +68,9 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			return new WebApiControllerScript
 			{
 				ScriptContent = File.ReadAllText(script.FullName),
-				LocalDependencies = new string[0],// { @"C:\Projects\Trash\SomeWebApp\SomeWebApp\bin\System.Web.Http.dll" },
+				LocalDependencies = new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "System.Web.Http.dll"), "System.Net.Http" },
 				NuGetDependencies = new string[0],
-				Namespaces = new string[0]
+				Namespaces = new [] {"System.Web.Http", "System.Net.Http"},
 			};
 		}
 	}

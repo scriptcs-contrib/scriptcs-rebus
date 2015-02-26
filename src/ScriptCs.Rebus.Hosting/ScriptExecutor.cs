@@ -79,8 +79,7 @@ namespace ScriptCs.Rebus.Hosting
 			    PrepareAdditionalPackages(_executionScript.NuGetDependencies),
 			    _executionScript.LocalDependencies, scriptServices.Logger);
 
-		    var scriptPacks = scriptPackResolver.GetPacks();
-		    _scriptExecutor.Initialize(assemblyPaths, scriptPacks.Union(new List<IScriptPack>() { new WebApiScriptHack() }));
+		    _scriptExecutor.Initialize(assemblyPaths, scriptPackResolver.GetPacks());
 		    _scriptExecutor.ImportNamespaces(_executionScript.Namespaces);
 		    _scriptExecutor.AddReferences(_executionScript.LocalDependencies);
 		    return scriptServices;
