@@ -1,12 +1,12 @@
 # [![ScriptCs](https://secure.gravatar.com/avatar/5c754f646971d8bc800b9d4057931938?s=200)](http://scriptcs.net/).[![Bedford OB](http://mookid.dk/oncode/wp-content/2011/10/logo400x150.png)](https://github.com/rebus-org/Rebus/)
 
-## What is it?
+## What is it? [![GitHub release](https://img.shields.io/github/release/scriptcs-contrib/scriptcs-rebus.svg?style=flat)](https://github.com/scriptcs-contrib/scriptcs-rebus/releases) [![NuGet](https://img.shields.io/nuget/v/ScriptCs.Rebus.svg?style=flat)](https://www.nuget.org/packages/ScriptCs.Rebus/) [![NuGet](https://img.shields.io/nuget/dt/scriptcs.rebus.svg?style=flat)](https://www.nuget.org/packages?q=ScriptCs.Rebus) [![Join the chat at https://gitter.im/scriptcs-contrib/scriptcs-rebus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scriptcs-contrib/scriptcs-rebus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A [scriptcs](https://github.com/scriptcs/scriptcs) script pack for [Rebus](https://github.com/rebus-org/Rebus).
 
 Wouldn't it just be nice if those lovely scripts of yours could talk to other scripts? You're up for a treat. With this script pack, it is possible to write scripts that can communicate via messaging to other scripts.
 
-Get it on [Nuget](https://www.nuget.org/packages/ScriptCs.Rebus).
+Get it on [NuGet](https://www.nuget.org/packages/ScriptCs.Rebus).
 
 ## Installation
 Prior to using this script pack you need to [install scriptcs](https://github.com/scriptcs/scriptcs#getting-scriptcs). Then open a command prompt as administrator. Now create a folder for the scripted messaging project. Navigate to this folder and install the Nuget package by running this command:
@@ -71,7 +71,7 @@ Configuration is similar to MSMQ and RabbitMQ, with a few exceptions:
 
 Receiving messages is similar to MSMQ and RabbitMQ.
 
-To use the Azure Service Bus option you are required to create an Azure Service Bus yourself. scriptCs.rebus will create the queue.
+To use the Azure Service Bus option you are required to create an Azure Service Bus in the Azure management portal yourself. scriptCs.rebus will create the queue.
 
 ## Basic Usage from Script
 The examples from above apply to scripts. Put the send and receive code into two `.csx` files, lets call them `send.csx` and `receive.csx`, and execute them by typing the following from a command prompt:
