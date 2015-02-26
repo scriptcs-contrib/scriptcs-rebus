@@ -10,16 +10,18 @@ namespace ScriptCs.Rebus
         private readonly List<string> _namespaces;
         private readonly List<string> _nugetDependencies;
         private readonly List<string> _localDependencies;
-        private bool _useMono;
-        private bool _useLogging;
+	    private readonly  List<string>_scriptPacks;
+	    private bool _useMono;
+	    private bool _useLogging;
 
-        public ScriptConfiguration(BaseBus baseBus, string script)
+	    public ScriptConfiguration(BaseBus baseBus, string script)
         {
             _baseBus = baseBus;
             _script = script;
             _namespaces = new List<string>();
             _nugetDependencies = new List<string>();
             _localDependencies = new List<string>();
+			_scriptPacks = new List<string>();
             _useMono = false;
             _useLogging = false;
         }
@@ -42,6 +44,12 @@ namespace ScriptCs.Rebus
             return this;
         }
 
+	    public ScriptConfiguration AddScriptPack(string scriptPack)
+	    {
+		    _scriptPacks.Add(scriptPack);
+		    return this;
+	    }
+
         public ScriptConfiguration UseMono()
         {
             _useMono = true;
@@ -62,6 +70,7 @@ namespace ScriptCs.Rebus
                 NuGetDependencies = _nugetDependencies.ToArray(),
                 Namespaces = _namespaces.ToArray(),
                 LocalDependencies = _localDependencies.ToArray(),
+				ScriptPacks = _scriptPacks.ToArray(),
                 UseMono = _useMono,
                 UseLogging = _useLogging
             });

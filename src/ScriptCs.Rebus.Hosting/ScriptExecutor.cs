@@ -79,23 +79,12 @@ namespace ScriptCs.Rebus.Hosting
 			    PrepareAdditionalPackages(_executionScript.NuGetDependencies),
 			    _executionScript.LocalDependencies, scriptServices.Logger);
 
-			// load all local assemblies
-			//assemblyPaths = assemblyPaths.Concat(GetAssemblyNames(scriptServices.AssemblyResolver));
-
-		    _scriptExecutor.Initialize(assemblyPaths, scriptPackResolver.GetPacks().Union(new List<IScriptPack>() { new WebApiScriptHack() }));
+		    var scriptPacks = scriptPackResolver.GetPacks();
+		    _scriptExecutor.Initialize(assemblyPaths, scriptPacks.Union(new List<IScriptPack>() { new WebApiScriptHack() }));
 		    _scriptExecutor.ImportNamespaces(_executionScript.Namespaces);
 		    _scriptExecutor.AddReferences(_executionScript.LocalDependencies);
 		    return scriptServices;
 	    }
-
-		private static IEnumerable<string> GetAssemblyNames(IAssemblyResolver assemblyResolver)
-		{
-			var assemblyPaths =
-				assemblyResolver.GetAssemblyPaths(Environment.CurrentDirectory);
-				//.Where(x => x.ToLower().Contains("system.web.http.dll"));
-			return assemblyPaths;
-		}
-
 
 	    private static IEnumerable<IPackageReference> PrepareAdditionalPackages(IEnumerable<string> dependencies)
         {
