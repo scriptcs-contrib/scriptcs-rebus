@@ -134,7 +134,6 @@
     <Compile Include="ScriptHandlers\WebApi\WebApiControllerBuilder.cs" />
     <Compile Include="ScriptHandlers\WebApi\WebApiControllerHandler.cs" />
     <Compile Include="ScriptHandlers\WebApi\WebApiFilePreProcessor.cs" />
-    <Compile Include="ScriptHandlers\WebApi\WebApiScriptHack.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
