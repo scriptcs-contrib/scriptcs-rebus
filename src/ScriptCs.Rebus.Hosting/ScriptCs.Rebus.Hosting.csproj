@@ -125,9 +125,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\MessagingConsole.cs" />
+    <Compile Include="Extensions\ScriptFileSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptExecutor.cs" />
-    <Compile Include="ScriptFileSystem.cs" />
     <Compile Include="ScriptHandlers\DefaultScriptExecutionHandler.cs" />
     <Compile Include="ScriptHandlers\WebApi\AssemblyControllerTypeResolver.cs" />
     <Compile Include="ScriptHandlers\WebApi\ScriptClass.cs" />

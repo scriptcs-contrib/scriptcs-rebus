@@ -10,11 +10,17 @@ namespace ScriptCs.Rebus
     public abstract class BaseBus
     {
         protected IBus SendBus;
-        protected IBus ReceiveBus;
-        protected readonly ConcurrentDictionary<string, Type> KnownTypes = new ConcurrentDictionary<string, Type>();
-        public BuiltinContainerAdapter Container;
+	    public IBus ReceiveBus { get; protected set; }
+	    public BuiltinContainerAdapter Container;
+	    protected readonly ConcurrentDictionary<string, Type> KnownTypes = new ConcurrentDictionary<string, Type>();
 
-        public abstract void Send<T>(T message) where T : class;
+	    public void RegisterHandler(Func<IHandleMessages> messageHandler)
+	    {
+			Console.WriteLine("Registered");
+		    Container.Register(messageHandler);
+	    }
+
+	    public abstract void Send<T>(T message) where T : class;
 
         public abstract BaseBus Receive<T>(Action<T> action) where T : class;
 
@@ -31,7 +37,7 @@ namespace ScriptCs.Rebus
         public ScriptConfiguration WithAScriptFile(string scriptFile)
         {
             //SendAScript(File.ReadAllText(scriptFile), namespaceName, dependencies);
-            return new ScriptConfiguration(this ,File.ReadAllText(scriptFile));
+            return new ScriptConfiguration(this, File.ReadAllText(scriptFile));
         }
 
         public ScriptConfiguration WithAScript(string script)

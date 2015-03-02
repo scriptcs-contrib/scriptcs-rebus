@@ -1,3 +1,5 @@
+using Rebus;
+
 namespace ScriptCs.Rebus.Scripts
 {
     public class DefaultExecutionScript

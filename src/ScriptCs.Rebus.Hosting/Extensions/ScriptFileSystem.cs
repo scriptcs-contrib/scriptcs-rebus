@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ScriptCs.Rebus.Hosting
+﻿namespace ScriptCs.Rebus.Hosting.Extensions
 {
 	/// <summary>
 	/// By default, the scriptcs.hosting inspects the bin folder for references. This class overrides the filesystem, by setting the same folder as the executing assembly.

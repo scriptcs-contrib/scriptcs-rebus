@@ -8,6 +8,7 @@ using Common.Logging;
 using ScriptCs.Engine.Mono;
 using ScriptCs.Engine.Roslyn;
 using ScriptCs.Hosting;
+using ScriptCs.Rebus.Hosting.Extensions;
 using ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi;
 using ScriptCs.Rebus.Scripts;
 using LogLevel = ScriptCs.Contracts.LogLevel;

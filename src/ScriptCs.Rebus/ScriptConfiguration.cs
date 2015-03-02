@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Rebus;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
@@ -6,7 +7,7 @@ namespace ScriptCs.Rebus
     public class ScriptConfiguration
     {
         private readonly BaseBus _baseBus;
-        private readonly string _script;
+	    private readonly string _script;
         private readonly List<string> _namespaces;
         private readonly List<string> _nugetDependencies;
         private readonly List<string> _localDependencies;
@@ -16,7 +17,7 @@ namespace ScriptCs.Rebus
 	    public ScriptConfiguration(BaseBus baseBus, string script)
         {
             _baseBus = baseBus;
-            _script = script;
+		    _script = script;
             _namespaces = new List<string>();
             _nugetDependencies = new List<string>();
             _localDependencies = new List<string>();
@@ -63,7 +64,7 @@ namespace ScriptCs.Rebus
                 Namespaces = _namespaces.ToArray(),
                 LocalDependencies = _localDependencies.ToArray(),
                 UseMono = _useMono,
-                UseLogging = _useLogging
+                UseLogging = _useLogging,
             });
         }
     }

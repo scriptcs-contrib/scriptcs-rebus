@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
 using Rebus.Transports.Msmq;
+using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
 {
@@ -25,10 +27,13 @@ namespace ScriptCs.Rebus
 
             if (SendBus == null)
             {
-                ConfigureSendBus();
+	            var isAScript = message.GetType() == typeof(DefaultExecutionScript);
+				Console.WriteLine(isAScript);
+				Container.Handle<string>(Console.WriteLine);
+				ConfigureSendBus(isAScript);
             }
 
-            Guard.AgainstNullArgument("_sendBus", SendBus);
+	        Guard.AgainstNullArgument("_sendBus", SendBus);
 
             Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
             try
@@ -41,12 +46,13 @@ namespace ScriptCs.Rebus
             }
             finally
             {
-                ShutDown();
+				//ShutDown();
             }
 
             Console.WriteLine("... message sent.");
 
-            ShutDown();
+
+	        //ShutDown();
         }
 
         public override BaseBus Receive<T>(Action<T> action)
@@ -54,7 +60,8 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("action", action);
 
             KnownTypes[typeof(T).Name] = typeof(T);
-            Container.Handle(action);
+	        Container.Handle(action);
+
 
             return this;
         }
@@ -76,21 +83,35 @@ namespace ScriptCs.Rebus
             return this;
         }
 
-        private void ConfigureSendBus()
+        private void ConfigureSendBus(bool isAScript)
         {
-            SendBus = Configure.With(Container)
+	        Action<RebusTransportConfigurer> transportConfig;
+	        if (!isAScript)
+	        {
+		        transportConfig =  configurer => configurer.UseMsmqInOneWayClientMode();
+	        }
+	        else
+	        {
+		        transportConfig =
+			        configurer =>
+				        configurer.UseMsmq(string.Format("{0}.reply", _endpoint),
+					        string.Format("{0}.reply.error", _endpoint));
+	        }
+	        
+			
+			SendBus = Configure.With(Container)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                .Transport(configurer => configurer.UseMsmqInOneWayClientMode())
+                .Transport(/*configurer => configurer.UseMsmqInOneWayClientMode()*/transportConfig)
                 .CreateBus()
                 .Start();
         }
 
-        private void ConfigureReceiveBus()
+	    private void ConfigureReceiveBus()
         {
             ReceiveBus = Configure.With(Container)
                 .Logging(_loggingConfigurer)
