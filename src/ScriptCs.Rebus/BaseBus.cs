@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Rebus;
 using Rebus.Configuration;
+using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
 {
@@ -14,11 +15,7 @@ namespace ScriptCs.Rebus
 	    public BuiltinContainerAdapter Container;
 	    protected readonly ConcurrentDictionary<string, Type> KnownTypes = new ConcurrentDictionary<string, Type>();
 
-	    public void RegisterHandler(Func<IHandleMessages> messageHandler)
-	    {
-			Console.WriteLine("Registered");
-		    Container.Register(messageHandler);
-	    }
+	    public abstract void RegisterHandler(Func<IHandleMessages> messageHandler);
 
 	    public abstract void Send<T>(T message) where T : class;
 

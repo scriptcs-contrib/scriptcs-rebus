@@ -13,6 +13,7 @@ namespace ScriptCs.Rebus
             session.ImportNamespace("Rebus.Logging");
             session.ImportNamespace("Rebus.Configuration");
             session.ImportNamespace("Rebus.Transports.Msmq");
+			session.ImportNamespace("ScriptCs.Rebus.Scripts");
         }
 
         public IScriptPackContext GetContext()

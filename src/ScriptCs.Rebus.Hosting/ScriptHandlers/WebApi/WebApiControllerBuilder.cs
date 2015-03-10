@@ -7,12 +7,17 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using NuGet;
+using Rebus;
+using Rebus.Configuration;
+using Rebus.Transports.Msmq;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 {
 	public class WebApiControllerBuilder
 	{
+		private BuiltinContainerAdapter _builtinContainerAdapter;
+
 		public void Build(HttpConfiguration config)
 		{
 			if (config == null) throw new ArgumentNullException("config");
@@ -24,14 +29,25 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 				var scripts =
 					Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
 						"bin\\Scripts"))
-						.Where(x => new FileInfo(x).Extension == ".csx")
-						.Select(x => new FileInfo(x));
+						.Select(x => new FileInfo(x))
+						.Where(x => x.Extension == ".csx")
+						.Where(x => File.Exists(x.FullName + ".metadata"));
 
 				IList<Type> controllers = new List<Type>();
 
 				foreach (var script in scripts)
 				{
-					ScriptExecutor.Init(CreateExecutableScript(script));
+
+					var metadata =
+						File.ReadAllLines(script.FullName + ".metadata")[0].Split(':');
+
+					var replyAddress = metadata[0].Trim();
+					var transport = metadata[1].Trim();
+					var bus = CreateReplyBus(transport);
+
+					ScriptExecutor.Init(CreateExecutableScript(script),
+						reply => bus.Advanced.Routing.Send(replyAddress, reply)
+						);
 
 					ScriptExecutor.ScriptServicesBuilder.FileSystem<FileSystem>();
 					ScriptExecutor.ScriptServicesBuilder
@@ -63,6 +79,25 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			}
 		}
 
+		private IBus CreateReplyBus(string transport)
+		{
+			Action<RebusTransportConfigurer> transportConfig;
+			switch (transport)
+			{
+				default:
+					transportConfig = configurer => configurer.UseMsmqInOneWayClientMode();
+					break;
+			}
+
+			_builtinContainerAdapter = new BuiltinContainerAdapter();
+			var replyBus = Configure.With(_builtinContainerAdapter)
+				.Transport(transportConfig)
+				.CreateBus()
+				.Start();
+
+			return replyBus;
+		}
+
 		private DefaultExecutionScript CreateExecutableScript(FileInfo script)
 		{
 			return new WebApiControllerScript
@@ -71,6 +106,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 				LocalDependencies = new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "System.Web.Http.dll"), "System.Net.Http" },
 				NuGetDependencies = new string[0],
 				Namespaces = new [] {"System.Web.Http", "System.Net.Http"},
+				UseLogging = true
 			};
 		}
 	}

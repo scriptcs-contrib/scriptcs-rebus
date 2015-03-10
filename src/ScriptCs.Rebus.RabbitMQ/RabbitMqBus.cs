@@ -1,4 +1,5 @@
 ﻿using System;
+using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.RabbitMQ;
@@ -24,7 +25,12 @@ namespace ScriptCs.Rebus.RabbitMQ
             _loggingConfigurer = configurer => configurer.None();
         }
 
-        public override void Send<T>(T message)
+	    public override void RegisterHandler(Func<IHandleMessages> messageHandler)
+	    {
+		    throw new NotImplementedException();
+	    }
+
+	    public override void Send<T>(T message)
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
@@ -35,9 +41,9 @@ namespace ScriptCs.Rebus.RabbitMQ
 
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
-            Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
+            Console.Write("Sending message of type {0}...", message.GetType().Name);
             SendBus.Advanced.Routing.Send(_endpoint, message);
-            Console.WriteLine("... message sent.");
+            Console.WriteLine("sent.");
 
             ShutDown();
         }

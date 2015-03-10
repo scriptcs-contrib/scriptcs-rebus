@@ -1,35 +1,37 @@
 ﻿using System;
 using Rebus;
+using Rebus.Configuration;
+using Rebus.Transports.Msmq;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus.Hosting.ScriptHandlers
 {
 	public class DefaultScriptExecutionHandler : IHandleMessages<DefaultExecutionScript>
 	{
-		private readonly IBus _bus;
-
-		public DefaultScriptExecutionHandler(IBus bus)
-		{
-			if (bus == null) throw new ArgumentNullException("bus");
-			_bus = bus;
-		}
-
 		public void Handle(DefaultExecutionScript message)
 		{
-			ScriptExecutor.Init(message);
+			var bus = CreateReplyBus(MessageContext.GetCurrent().Headers["transport"].ToString());
 
-			var scriptResult = ScriptExecutor.ExecuteScript();
-			if (scriptResult.CompileExceptionInfo != null)
-			{
-				if (scriptResult.CompileExceptionInfo.SourceException != null)
-				{
-					_bus.Reply(scriptResult.CompileExceptionInfo.SourceException.Message);
-				}
-			}
-			else
-			{
-				_bus.Reply("Executed with no errors!");
-			}
+			ScriptExecutor.Init(message, reply => bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, reply));
+
+			ScriptExecutor.ExecuteScript();
 		}
+
+		private IBus CreateReplyBus(string transport)
+		{
+			Action<RebusTransportConfigurer> transportConfig;
+			switch (transport)
+			{
+				default:
+					transportConfig = configurer => configurer.UseMsmqInOneWayClientMode();
+					break;
+			}
+
+			return Configure.With(new BuiltinContainerAdapter())
+				.Transport(transportConfig)
+				.CreateBus()
+				.Start();
+		}
+
 	}
 }

@@ -1,32 +1,34 @@
 ﻿using System;
+using System.IO;
 using Rebus;
 using ScriptCs.Contracts;
 
 namespace ScriptCs.Rebus.Hosting.Extensions
 {
-	public class MessagingConsole : IConsole 
+	public class MessagingConsole : IConsole
 	{
-		private readonly IBus _bus;
+		private readonly Action<object> _reply;
 
-		public MessagingConsole(IBus bus)
+		public MessagingConsole(Action<object> reply)
 		{
-			if (bus == null) throw new ArgumentNullException("bus");
-			_bus = bus;
+			if (reply == null) throw new ArgumentNullException("reply");
+			_reply = reply;
+
+			Console.SetOut(new MessagingWriter(reply));
 		}
 
 		public void Write(string value)
 		{
-			_bus.Reply(value);
+			throw new NotImplementedException();
 		}
 
 		public void WriteLine()
 		{
-			throw new NotImplementedException();
 		}
 
 		public void WriteLine(string value)
 		{
-			_bus.Reply(value);
+			_reply(value);
 		}
 
 		public string ReadLine()
@@ -51,8 +53,8 @@ namespace ScriptCs.Rebus.Hosting.Extensions
 
 		public ConsoleColor ForegroundColor
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return Console.ForegroundColor; }
+			set { Console.ForegroundColor = value; }
 		}
 	}
 }

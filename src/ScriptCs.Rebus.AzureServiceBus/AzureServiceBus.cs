@@ -1,4 +1,5 @@
 ﻿using System;
+using Rebus;
 using Rebus.AzureServiceBus;
 using Rebus.Configuration;
 using Rebus.Logging;
@@ -24,7 +25,12 @@ namespace ScriptCs.Rebus.AzureServiceBus
             Container = new BuiltinContainerAdapter();
         }
 
-        public override void Send<T>(T message)
+	    public override void RegisterHandler(Func<IHandleMessages> messageHandler)
+	    {
+		    throw new NotImplementedException();
+	    }
+
+	    public override void Send<T>(T message)
         {
             Guard.AgainstNullArgument("message", message);
 

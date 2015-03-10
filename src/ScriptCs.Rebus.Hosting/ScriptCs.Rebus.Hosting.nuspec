@@ -1,20 +1,24 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>ScriptCs.Rebus.Hosting</id>
     <version>0.6.0</version>
     <title>ScriptCs.Rebus.Hosting</title>
     <authors>Mads Tjørnelund Toustrup</authors>
+    <owners>Mads Tjørnelund Toustrup</owners>
     <projectUrl>https://github.com/madstt/ScriptCs.Rebus</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>An extension to ScriptCs.Rebus for sending scripts over a bus for execution.</description>
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
+    <tags>scriptcs rebus scriptpack messaging hosting</tags>
     <dependencies>
       <dependency id="ScriptCs.Rebus" version="0.6.0" />
       <dependency id="ScriptCs.Hosting" version="0.12.0" />
       <dependency id="ScriptCs.Engine.Mono" version="0.12.0" />
       <dependency id="ScriptCs.Engine.Roslyn" version="0.12.0" />
       <dependency id="Microsoft.AspNet.WebApi.Core" version="5.2.2" />
+      <dependency id="ScriptCs.Rebus.AzureServiceBus" version="0.6.0" />
+      <dependency id="ScriptCs.Rebus.RabbitMQ" version="0.6.0" />
     </dependencies>
-    <tags>scriptcs rebus scriptpack messaging hosting</tags>
   </metadata>
 </package>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Versioning;
 using ScriptCs.Contracts;
 using Common.Logging;
+using Rebus;
 using ScriptCs.Engine.Mono;
 using ScriptCs.Engine.Roslyn;
 using ScriptCs.Hosting;
@@ -20,15 +21,18 @@ namespace ScriptCs.Rebus.Hosting
 	    private static DefaultExecutionScript _executionScript;
 	    public static ScriptServicesBuilder ScriptServicesBuilder;
 	    private static IScriptExecutor _scriptExecutor;
+	    private static Action<object> _reply; 
 
-	    public static void Init(DefaultExecutionScript executionScript)
+	    public static void Init(DefaultExecutionScript executionScript, Action<object> reply)
 	    {
 		    if (executionScript == null)
 			    throw new ArgumentNullException("executionScript");
+		    if (reply == null) throw new ArgumentNullException("reply");
 
 		    _executionScript = executionScript;
-		    CreateScriptServices(executionScript.UseMono,
-				executionScript.UseLogging);
+		    _reply = reply;
+			CreateScriptServices(executionScript.UseMono,
+				executionScript.UseLogging, reply);
 	    }
 		
 	    public static ScriptResult ExecuteFile(string filePath)
@@ -59,11 +63,15 @@ namespace ScriptCs.Rebus.Hosting
 						    scriptResult.CompileExceptionInfo.SourceException.Message);
 		    _scriptExecutor.Terminate();
 
-		    return scriptResult;
+			_reply(ScriptExecutionLifetime.Terminated);
+			
+			return scriptResult;
 	    }
 
 	    private static ScriptServices SetupExecution()
 	    {
+			_reply(ScriptExecutionLifetime.Started);
+
 		    var scriptServices = ScriptServicesBuilder.Build();
 		    
 			// set current dicrectory, import for NuGet.
@@ -95,8 +103,6 @@ namespace ScriptCs.Rebus.Hosting
         // prepare NuGet dependencies, download them if required
         private static IEnumerable<string> PreparePackages(IPackageAssemblyResolver packageAssemblyResolver, IPackageInstaller packageInstaller, IEnumerable<IPackageReference> additionalNuGetReferences, IEnumerable<string> localDependencies, ILog logger)
         {
-			//TODO: Make sure we're in some bin directory, or leave out existing
-
 	        var workingDirectory = Environment.CurrentDirectory;
 
             var packages = packageAssemblyResolver.GetPackages(workingDirectory);
@@ -116,9 +122,9 @@ namespace ScriptCs.Rebus.Hosting
             return assemblyNames;
         }
 
-        private static void CreateScriptServices(bool useMono, bool useLogging)
+        private static void CreateScriptServices(bool useMono, bool useLogging, Action<object> reply)
         {
-            var console = new ScriptConsole();
+            var console = new MessagingConsole(reply);
             var configurator = new LoggerConfigurator(useLogging ? LogLevel.Debug : LogLevel.Info);
             configurator.Configure(console);
             var logger = configurator.GetLogger();
