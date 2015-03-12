@@ -1,7 +1,6 @@
 # [![ScriptCs](https://secure.gravatar.com/avatar/5c754f646971d8bc800b9d4057931938?s=200)](http://scriptcs.net/).[![Bedford OB](http://mookid.dk/oncode/wp-content/2011/10/logo400x150.png)](https://github.com/rebus-org/Rebus/)
 
-## What is it? [![NuGet](https://img.shields.io/nuget/v/ScriptCs.Rebus.svg?style=flat)](https://www.nuget.org/packages/ScriptCs.Rebus/) [![NuGet](https://img.shields.io/nuget/dt/scriptcs.rebus.svg?style=flat)](https://www.nuget.org/packages?q=ScriptCs.Rebus) 
-[![Stories in Ready](https://badge.waffle.io/scriptcs-contrib/scriptcs-rebus.svg?label=ready&title=Ready)](http://waffle.io/scriptcs-contrib/scriptcs-rebus)
+## What is it? [![NuGet](https://img.shields.io/nuget/v/ScriptCs.Rebus.svg?style=flat)](https://www.nuget.org/packages/ScriptCs.Rebus/) [![NuGet](https://img.shields.io/nuget/dt/scriptcs.rebus.svg?style=flat)](https://www.nuget.org/packages?q=ScriptCs.Rebus) [![Stories in Ready](https://badge.waffle.io/scriptcs-contrib/scriptcs-rebus.svg?label=ready&title=Ready)](http://waffle.io/scriptcs-contrib/scriptcs-rebus)
 [![Join the chat at https://gitter.im/scriptcs-contrib/scriptcs-rebus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scriptcs-contrib/scriptcs-rebus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A [scriptcs](https://github.com/scriptcs/scriptcs) script pack for [Rebus](https://github.com/rebus-org/Rebus).
