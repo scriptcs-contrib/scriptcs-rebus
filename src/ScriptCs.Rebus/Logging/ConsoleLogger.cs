@@ -5,11 +5,9 @@ namespace ScriptCs.Rebus.Logging
 {
 	public class ConsoleLogger : IReceiveLogEntries
 	{
-		private LogLevel _logLevel;
-
 		public ConsoleLogger(LogLevel logLevel)
 		{
-			_logLevel = logLevel;
+			LogLevel = logLevel;
 		}
 
 		public void Log(string logEntry)
@@ -17,11 +15,7 @@ namespace ScriptCs.Rebus.Logging
 			Console.WriteLine(logEntry);
 		}
 
-		public LogLevel LogLevel
-		{
-			set { _logLevel = value; }
-			get { return _logLevel; }
-		}
+		public LogLevel LogLevel { set; get; }
 	}
 
 	//public abstract class BaseLogHandler
