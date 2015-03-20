@@ -45,7 +45,7 @@ namespace ScriptCs.Rebus.RabbitMQ
             SendBus.Advanced.Routing.Send(_endpoint, message);
             Console.WriteLine("sent.");
 
-            ShutDown();
+			ShutDown();
         }
 
         public override BaseBus Receive<T>(Action<T> action)

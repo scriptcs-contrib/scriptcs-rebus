@@ -45,7 +45,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
             SendBus.Advanced.Routing.Send(_endpoint, message);
             Console.WriteLine("... message sent.");
 
-            ShutDown();
+			ShutDown();
         }
 
         public override BaseBus Receive<T>(Action<T> action)

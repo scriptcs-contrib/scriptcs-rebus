@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Rebus;
+using ScriptCs.Rebus.Logging;
 
 namespace ScriptCs.Rebus.Hosting.Extensions
 {
@@ -22,8 +22,9 @@ namespace ScriptCs.Rebus.Hosting.Extensions
 
 		public override void WriteLine(string value)
 		{
-			_reply(value);
+			_reply(new ScriptExecutionConsoleOutput(value));
 		}
 
 	}
+
 }

@@ -12,13 +12,15 @@ namespace ScriptCs.Rebus
 {
     public class MsmqBus : BaseBus
     {
-        private readonly string _endpoint;
+		private readonly string _endpoint;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
         public MsmqBus(string endpoint)
         {
-            _endpoint = endpoint;
-            Container = new BuiltinContainerAdapter();
+	        if (endpoint == null) throw new ArgumentNullException("endpoint");
+	        Endpoint = endpoint;
+	        _endpoint = endpoint;
+	        Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
 
@@ -34,7 +36,7 @@ namespace ScriptCs.Rebus
 	        var isAScript = message.GetType() == typeof(DefaultExecutionScript) || message.GetType().BaseType == typeof(DefaultExecutionScript);
 	        if (SendBus == null)
 	        {
-				//Container.Handle<string>(Console.WriteLine);
+				//Container.Handle<string>(ToConsole.WriteLine);
 				//RegisterDefaultHandlers();
 
 		        ConfigureSendBus(isAScript);
@@ -68,7 +70,7 @@ namespace ScriptCs.Rebus
 
             KnownTypes[typeof(T).Name] = typeof(T);
 	        Container.Handle(action);
-			RegisterDefaultHandlers();
+			//RegisterDefaultHandlers();
 
             return this;
         }
@@ -113,10 +115,7 @@ namespace ScriptCs.Rebus
 				        x => x.Assembly.GetName().Name.Contains("ℛ")
 					        ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
 					        : null))
-					//.AddTypeResolver(
-					//	x => x.TypeName == typeof(Int64).FullName ? typeof (ScriptExecutionLifetime) : null))
-		        .Transport( /*configurer => configurer.UseMsmqInOneWayClientMode()*/
-			        transportConfig)
+		        .Transport(transportConfig)
 		        .CreateBus()
 		        .Start();
 
@@ -130,36 +129,11 @@ namespace ScriptCs.Rebus
 				    .AddTypeResolver(
 					    x =>
 						    x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
-					//.AddNameResolver(
-					//	x =>
-					//		x.Name == typeof (ScriptExecutionLifetime).Name
-					//			? new TypeDescriptor(x.AssemblyQualifiedName,
-					//				x.Name)
-					//			: null))
 			    .Transport(
 				    configurer =>
 					    configurer.UseMsmq(_endpoint, string.Format("{0}.error", _endpoint)))
 			    .CreateBus()
 			    .Start();
-	    }
-
-	    private void RegisterDefaultHandlers()
-	    {
-		    Container.Handle<Int64>(ScriptExecutionLifetimeHandler);
-	    }
-
-	    private void ScriptExecutionLifetimeHandler(long l)
-	    {
-		    switch (l)
-		    {
-			    case 0:
-				    Console.WriteLine("Entering messaging console...");
-				    break;
-			    default:
-				    Console.WriteLine("Terminating messaging console...");
-				    break;
-		    }
-
 	    }
     }
 }

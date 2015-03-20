@@ -19,10 +19,10 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers
 
 		private IBus CreateReplyBus(string transport)
 		{
-			Action<RebusTransportConfigurer> transportConfig;
+			Action<RebusTransportConfigurer> transportConfig = null;
 			switch (transport)
 			{
-				default:
+				case "MSMQ":
 					transportConfig = configurer => configurer.UseMsmqInOneWayClientMode();
 					break;
 			}

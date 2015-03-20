@@ -52,22 +52,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ScriptConfiguration.cs" />
+    <Compile Include="Configuration\ScriptLoggingConfiguration.cs" />
+    <Compile Include="Extensions\LoggingExtensions.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="BaseBus.cs" />
-    <Compile Include="LoggingStrategies.cs" />
+    <Compile Include="Logging\IReceiveLogEntries.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="MsmqBus.cs" />
     <Compile Include="RebusScriptBus.cs" />
     <Compile Include="RebusScriptPack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptConfiguration.cs" />
     <Compile Include="ScriptExecutionLifetime.cs" />
-    <Compile Include="ScriptExecutionLifetimeHandler.cs" />
     <Compile Include="Scripts\DefaultExecutionScript.cs" />
     <Compile Include="Scripts\WebApiControllerScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -37,8 +37,8 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 		    var metaDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
 			    string.Format("bin\\Scripts\\{0}Controller.csx.metadata", message.ControllerName));
 		    File.WriteAllText(metaDataPath,
-			    string.Format("{0} : {1}", MessageContext.GetCurrent().ReturnAddress,
-				    MessageContext.GetCurrent().Headers["transport"]));
+			    string.Format("{0} : {1} : {2}", MessageContext.GetCurrent().ReturnAddress,
+					MessageContext.GetCurrent().Headers["transport"], message.LogLevel.ToString().ToUpperInvariant()));
 
 			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, "Script saved...");
         }

@@ -10,6 +10,7 @@ using NuGet;
 using Rebus;
 using Rebus.Configuration;
 using Rebus.Transports.Msmq;
+using ScriptCs.Contracts;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
@@ -43,11 +44,11 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 
 					var replyAddress = metadata[0].Trim();
 					var transport = metadata[1].Trim();
-					var bus = CreateReplyBus(transport);
+					var logLevel = ToLogLevel(metadata[2].Trim());
+					var bus = CreateReplyBus(transport, logLevel);
 
-					ScriptExecutor.Init(CreateExecutableScript(script),
-						reply => bus.Advanced.Routing.Send(replyAddress, reply)
-						);
+					ScriptExecutor.Init(CreateExecutableScript(script, logLevel),
+						reply => bus.Publish(reply));
 
 					ScriptExecutor.ScriptServicesBuilder.FileSystem<FileSystem>();
 					ScriptExecutor.ScriptServicesBuilder
@@ -79,7 +80,22 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			}
 		}
 
-		private IBus CreateReplyBus(string transport)
+		private LogLevel ToLogLevel(string logLevelAsString)
+		{
+			switch (logLevelAsString)
+			{
+				case "TRACE":
+					return LogLevel.Trace;
+				case "DEBUG":
+					return LogLevel.Debug;
+				case "ERROR":
+					return LogLevel.Error;
+				default:
+					return LogLevel.Info;
+			}
+		}
+
+		private IBus CreateReplyBus(string transport, LogLevel logLevel)
 		{
 			Action<RebusTransportConfigurer> transportConfig;
 			switch (transport)
@@ -98,7 +114,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			return replyBus;
 		}
 
-		private DefaultExecutionScript CreateExecutableScript(FileInfo script)
+		private DefaultExecutionScript CreateExecutableScript(FileInfo script, LogLevel logLevel)
 		{
 			return new WebApiControllerScript
 			{
@@ -106,7 +122,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 				LocalDependencies = new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "System.Web.Http.dll"), "System.Net.Http" },
 				NuGetDependencies = new string[0],
 				Namespaces = new [] {"System.Web.Http", "System.Net.Http"},
-				UseLogging = true
+				LogLevel = logLevel
 			};
 		}
 	}

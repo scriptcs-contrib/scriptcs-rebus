@@ -4,16 +4,19 @@ using System.IO;
 using System.Text;
 using Rebus;
 using Rebus.Configuration;
+using ScriptCs.Rebus.Configuration;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
 {
-    public abstract class BaseBus
+    public abstract class BaseBus : IDisposable
     {
         protected IBus SendBus;
-	    public IBus ReceiveBus { get; protected set; }
+	    protected IBus ReceiveBus;
+
 	    public BuiltinContainerAdapter Container;
 	    protected readonly ConcurrentDictionary<string, Type> KnownTypes = new ConcurrentDictionary<string, Type>();
+	    protected internal string Endpoint { get; set; }
 
 	    public abstract void RegisterHandler(Func<IHandleMessages> messageHandler);
 
@@ -33,14 +36,17 @@ namespace ScriptCs.Rebus
 
         public ScriptConfiguration WithAScriptFile(string scriptFile)
         {
-            //SendAScript(File.ReadAllText(scriptFile), namespaceName, dependencies);
-            return new ScriptConfiguration(this, File.ReadAllText(scriptFile));
+            return new ScriptConfiguration(this, File.ReadAllText(scriptFile), Endpoint);
         }
 
         public ScriptConfiguration WithAScript(string script)
         {
-            //Send(new Script { ScriptContent = script, Namespaces = namespaceName, Dependencies = dependencies });
-            return new ScriptConfiguration(this, script);
+            return new ScriptConfiguration(this, script, Endpoint);
         }
+
+	    public void Dispose()
+	    {
+		    ShutDown();
+	    }
     }
 }

@@ -2,6 +2,7 @@
 using System.IO;
 using Rebus;
 using ScriptCs.Contracts;
+using ScriptCs.Rebus.Logging;
 
 namespace ScriptCs.Rebus.Hosting.Extensions
 {
@@ -28,7 +29,29 @@ namespace ScriptCs.Rebus.Hosting.Extensions
 
 		public void WriteLine(string value)
 		{
-			_reply(value);
+			object reply = null;
+			
+			if (value.StartsWith("DEBUG:"))
+			{
+				reply = new ScriptExecutionLogEntry(value, LogLevel.Debug);
+			}
+
+			if (value.StartsWith("INFO:"))
+			{
+				reply = new ScriptExecutionLogEntry(value, LogLevel.Info);
+			}
+
+			if (value.StartsWith("ERROR:"))
+			{
+				reply = new ScriptExecutionLogEntry(value, LogLevel.Error);
+			}
+
+			if (value.StartsWith("TRACE:"))
+			{
+				reply = new ScriptExecutionLogEntry(value, LogLevel.Trace);
+			}
+
+			if (reply != null) _reply(reply);
 		}
 
 		public string ReadLine()

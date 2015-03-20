@@ -11,6 +11,7 @@ using ScriptCs.Engine.Roslyn;
 using ScriptCs.Hosting;
 using ScriptCs.Rebus.Hosting.Extensions;
 using ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi;
+using ScriptCs.Rebus.Logging;
 using ScriptCs.Rebus.Scripts;
 using LogLevel = ScriptCs.Contracts.LogLevel;
 
@@ -32,7 +33,7 @@ namespace ScriptCs.Rebus.Hosting
 		    _executionScript = executionScript;
 		    _reply = reply;
 			CreateScriptServices(executionScript.UseMono,
-				executionScript.UseLogging, reply);
+				executionScript.LogLevel, reply);
 	    }
 		
 	    public static ScriptResult ExecuteFile(string filePath)
@@ -56,21 +57,21 @@ namespace ScriptCs.Rebus.Hosting
 	    private static ScriptResult EvaluateScriptResult(ScriptResult scriptResult,
 		    ScriptServices scriptServices)
 	    {
-		    if (_executionScript.UseLogging && scriptResult != null)
+		    if (scriptResult != null)
 			    if (scriptResult.CompileExceptionInfo != null)
 				    if (scriptResult.CompileExceptionInfo.SourceException != null)
 					    scriptServices.Logger.Debug(
 						    scriptResult.CompileExceptionInfo.SourceException.Message);
 		    _scriptExecutor.Terminate();
 
-			_reply(ScriptExecutionLifetime.Terminated);
+			_reply(new ScriptExecutionLifetimeStatus {ExecutionLifetime = ScriptExecutionLifetime.Terminated});
 			
 			return scriptResult;
 	    }
 
 	    private static ScriptServices SetupExecution()
 	    {
-			_reply(ScriptExecutionLifetime.Started);
+			_reply(new ScriptExecutionLifetimeStatus {ExecutionLifetime = ScriptExecutionLifetime.Started});
 
 		    var scriptServices = ScriptServicesBuilder.Build();
 		    
@@ -122,10 +123,10 @@ namespace ScriptCs.Rebus.Hosting
             return assemblyNames;
         }
 
-        private static void CreateScriptServices(bool useMono, bool useLogging, Action<object> reply)
+        private static void CreateScriptServices(bool useMono, LogLevel logLevel, Action<object> reply)
         {
             var console = new MessagingConsole(reply);
-            var configurator = new LoggerConfigurator(useLogging ? LogLevel.Debug : LogLevel.Info);
+            var configurator = new LoggerConfigurator(logLevel);
             configurator.Configure(console);
             var logger = configurator.GetLogger();
             ScriptServicesBuilder = new ScriptServicesBuilder(console, logger);
