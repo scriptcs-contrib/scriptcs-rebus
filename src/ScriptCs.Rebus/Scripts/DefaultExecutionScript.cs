@@ -1,10 +1,11 @@
 using Rebus;
 using ScriptCs.Contracts;
+using ScriptCs.Rebus.Configuration;
 using ScriptCs.Rebus.Logging;
 
 namespace ScriptCs.Rebus.Scripts
 {
-    public class DefaultExecutionScript
+    public class DefaultExecutionScript : IExecutionScript
     {
         public string ScriptContent { get; set; }
         public bool UseMono { get; set; }

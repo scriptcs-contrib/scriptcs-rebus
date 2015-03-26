@@ -12,22 +12,14 @@ namespace ScriptCs.Rebus
 {
     public class MsmqBus : BaseBus
     {
-		private readonly string _endpoint;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
         public MsmqBus(string endpoint)
         {
-	        if (endpoint == null) throw new ArgumentNullException("endpoint");
 	        Endpoint = endpoint;
-	        _endpoint = endpoint;
 	        Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
-
-	    public override void RegisterHandler(Func<IHandleMessages> messageHandler)
-	    {
-			Container.Register(messageHandler);
-	    }
 
 	    public override void Send<T>(T message)
         {
@@ -36,9 +28,6 @@ namespace ScriptCs.Rebus
 	        var isAScript = message.GetType() == typeof(DefaultExecutionScript) || message.GetType().BaseType == typeof(DefaultExecutionScript);
 	        if (SendBus == null)
 	        {
-				//Container.Handle<string>(ToConsole.WriteLine);
-				//RegisterDefaultHandlers();
-
 		        ConfigureSendBus(isAScript);
 	        }
 
@@ -48,7 +37,7 @@ namespace ScriptCs.Rebus
             try
             {
 				SendBus.AttachHeader(message, "transport", "MSMQ");
-                SendBus.Advanced.Routing.Send(_endpoint, message);
+                SendBus.Advanced.Routing.Send(Endpoint, message);
             }
             catch (Exception e)
             {
@@ -70,7 +59,6 @@ namespace ScriptCs.Rebus
 
             KnownTypes[typeof(T).Name] = typeof(T);
 	        Container.Handle(action);
-			//RegisterDefaultHandlers();
 
             return this;
         }
@@ -82,7 +70,7 @@ namespace ScriptCs.Rebus
                 ConfigureReceiveBus();
             }
 
-            Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
+            Console.WriteLine("Awaiting messsage on {0}...", Endpoint);
         }
 
 	    public override BaseBus UseLogging()
@@ -103,8 +91,8 @@ namespace ScriptCs.Rebus
 	        {
 		        transportConfig =
 			        configurer =>
-				        configurer.UseMsmq(string.Format("{0}.reply", _endpoint),
-					        string.Format("{0}.reply.error", _endpoint));
+				        configurer.UseMsmq(string.Format("{0}.reply", Endpoint),
+					        string.Format("{0}.reply.error", Endpoint));
 	        }
 
 
@@ -131,7 +119,7 @@ namespace ScriptCs.Rebus
 						    x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
 			    .Transport(
 				    configurer =>
-					    configurer.UseMsmq(_endpoint, string.Format("{0}.error", _endpoint)))
+					    configurer.UseMsmq(Endpoint, string.Format("{0}.error", Endpoint)))
 			    .CreateBus()
 			    .Start();
 	    }

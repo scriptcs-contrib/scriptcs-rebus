@@ -3,28 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
-using ScriptCs.Contracts;
 using Common.Logging;
-using Rebus;
+using ScriptCs.Contracts;
 using ScriptCs.Engine.Mono;
 using ScriptCs.Engine.Roslyn;
 using ScriptCs.Hosting;
+using ScriptCs.Rebus.Configuration;
 using ScriptCs.Rebus.Hosting.Extensions;
-using ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi;
 using ScriptCs.Rebus.Logging;
-using ScriptCs.Rebus.Scripts;
 using LogLevel = ScriptCs.Contracts.LogLevel;
 
 namespace ScriptCs.Rebus.Hosting
 {
     public class ScriptExecutor
     {
-	    private static DefaultExecutionScript _executionScript;
+	    private static IExecutionScript _executionScript;
 	    public static ScriptServicesBuilder ScriptServicesBuilder;
 	    private static IScriptExecutor _scriptExecutor;
 	    private static Action<object> _reply; 
 
-	    public static void Init(DefaultExecutionScript executionScript, Action<object> reply)
+	    public static void Init(IExecutionScript executionScript, Action<object> reply)
 	    {
 		    if (executionScript == null)
 			    throw new ArgumentNullException("executionScript");
