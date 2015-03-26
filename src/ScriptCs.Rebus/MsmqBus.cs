@@ -6,6 +6,7 @@ using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
 using Rebus.Transports.Msmq;
+using ScriptCs.Rebus.Configuration;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
@@ -25,18 +26,23 @@ namespace ScriptCs.Rebus
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-	        var isAScript = message.GetType() == typeof(DefaultExecutionScript) || message.GetType().BaseType == typeof(DefaultExecutionScript);
+	        var isAScript = message.GetType() == typeof(IExecutionScript) || message.GetType().BaseType == typeof(IExecutionScript);
 	        if (SendBus == null)
 	        {
 		        ConfigureSendBus(isAScript);
 	        }
 
 		    Guard.AgainstNullArgument("_sendBus", SendBus);
+		    
+			// Add header information
+		    if (isAScript)
+		    {
+			    SendBus.AttachHeader(message, "transport", "MSMQ");
+		    }
 
-            Console.Write("Sending message of type {0}...", message.GetType().Name);
+		    Console.Write("Sending message of type {0}...", message.GetType().Name);
             try
             {
-				SendBus.AttachHeader(message, "transport", "MSMQ");
                 SendBus.Advanced.Routing.Send(Endpoint, message);
             }
             catch (Exception e)

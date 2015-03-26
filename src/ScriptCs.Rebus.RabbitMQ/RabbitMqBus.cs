@@ -4,6 +4,7 @@ using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.RabbitMQ;
 using Rebus.Serialization.Json;
+using ScriptCs.Rebus.Configuration;
 
 namespace ScriptCs.Rebus.RabbitMQ
 {
@@ -27,16 +28,39 @@ namespace ScriptCs.Rebus.RabbitMQ
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-            if (SendBus == null)
+			var isAScript = message.GetType() == typeof(IExecutionScript) || message.GetType().BaseType == typeof(IExecutionScript);
+			if (SendBus == null)
             {
-                ConfigureRabbitSendBus();
+                ConfigureRabbitSendBus(isAScript);
             }
 
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
-            Console.Write("Sending message of type {0}...", message.GetType().Name);
-            SendBus.Advanced.Routing.Send(Endpoint, message);
-            Console.WriteLine("sent.");
+			// Add header information
+			if (isAScript)
+			{
+				SendBus.AttachHeader(message, "connectionString", _rabbitConnectionString);
+				SendBus.AttachHeader(message, "transport", "RABBIT");
+			}
+
+
+			Console.Write("Sending message of type {0}...", message.GetType().Name);
+
+			try
+			{
+
+				SendBus.Advanced.Routing.Send(Endpoint, message);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+			finally
+			{
+				ShutDown();
+			}
+            
+			Console.WriteLine("sent.");
 
 			ShutDown();
         }
@@ -68,8 +92,23 @@ namespace ScriptCs.Rebus.RabbitMQ
             return this;
         }
 
-        private void ConfigureRabbitSendBus()
+        private void ConfigureRabbitSendBus(bool isAScript)
         {
+	        Action<RebusTransportConfigurer> transportConfig;
+	        if (!isAScript)
+	        {
+		        transportConfig =
+			        configurer =>
+				        configurer.UseRabbitMqInOneWayMode(_rabbitConnectionString);
+	        }
+	        else
+	        {
+		        transportConfig =
+			        configurer =>
+				        configurer.UseRabbitMq(_rabbitConnectionString, string.Format("{0}.reply", Endpoint),
+					        string.Format("{0}.reply.error", Endpoint));
+	        }
+
             SendBus = Configure.With(Container)
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
@@ -77,7 +116,7 @@ namespace ScriptCs.Rebus.RabbitMQ
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
                             : null))
-                        .Transport(configurer => configurer.UseRabbitMqInOneWayMode(_rabbitConnectionString))
+                        .Transport(transportConfig)
                 .CreateBus()
                 .Start();
         }
