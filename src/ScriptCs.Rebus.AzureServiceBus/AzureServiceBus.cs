@@ -4,104 +4,128 @@ using Rebus.AzureServiceBus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
+using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus.AzureServiceBus
 {
-    public class AzureServiceBus : BaseBus
-    {
-        private readonly string _endpoint;
-        private readonly string _azureConnectionString;
-        private Action<LoggingConfigurer> _loggingConfigurer;
+	public class AzureServiceBus : BaseBus
+	{
+		private readonly string _endpoint;
+		private readonly string _azureConnectionString;
+		private Action<LoggingConfigurer> _loggingConfigurer;
 
-        public AzureServiceBus(string endpoint, string azureConnectionString)
-        {
-            Guard.AgainstNullArgument("endpoint", endpoint);
-            Guard.AgainstNullArgument("azureConnectionString", azureConnectionString);
+		public AzureServiceBus(string endpoint, string azureConnectionString)
+		{
+			Guard.AgainstNullArgument("endpoint", endpoint);
+			Guard.AgainstNullArgument("azureConnectionString", azureConnectionString);
 
-            _endpoint = endpoint;
-            _azureConnectionString = azureConnectionString;
-            _loggingConfigurer = configurer => configurer.None();
+			Endpoint = endpoint;
+			_endpoint = endpoint;
+			_azureConnectionString = azureConnectionString;
+			_loggingConfigurer = configurer => configurer.None();
 
-            Container = new BuiltinContainerAdapter();
-        }
+			Container = new BuiltinContainerAdapter();
+		}
 
-	    public override void RegisterHandler(Func<IHandleMessages> messageHandler)
-	    {
-		    throw new NotImplementedException();
-	    }
-
-	    public override void Send<T>(T message)
+		public override void Send<T>(T message)
         {
             Guard.AgainstNullArgument("message", message);
 
-            if (SendBus == null)
+			var isAScript = message.GetType() == typeof(DefaultExecutionScript) || message.GetType().BaseType == typeof(DefaultExecutionScript);
+			if (SendBus == null)
             {
-                ConfigureAzureSendBus();
+                ConfigureAzureSendBus(isAScript);
             }
 
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
-            Console.WriteLine("Sending message of type {0}...", message.GetType().Name);
-            SendBus.Advanced.Routing.Send(_endpoint, message);
-            Console.WriteLine("... message sent.");
+            Console.Write("Sending message of type {0}...", message.GetType().Name);
+
+			try
+			{
+				SendBus.AttachHeader(message, "transport", "AZURE");
+				SendBus.Advanced.Routing.Send(_endpoint, message);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+		    finally
+		    {
+			    ShutDown();
+		    }
+            
+			Console.WriteLine("sent.");
 
 			ShutDown();
         }
 
-        public override BaseBus Receive<T>(Action<T> action)
-        {
-            Guard.AgainstNullArgument("action", action);
+		public override BaseBus Receive<T>(Action<T> action)
+		{
+			Guard.AgainstNullArgument("action", action);
 
-            KnownTypes[typeof(T).Name] = typeof(T);
-            Container.Handle(action);
+			KnownTypes[typeof(T).Name] = typeof(T);
+			Container.Handle(action);
 
-            return this;
+			return this;
+		}
 
-        }
+		public override void Start()
+		{
+			if (ReceiveBus == null)
+			{
+				ConfigureAzureReceiveBus();
+			}
 
-        public override void Start()
-        {
-            if (ReceiveBus == null)
-            {
-                ConfigureAzureReceiveBus();
-            }
+			Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
+		}
 
-            Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
-        }
+		public override BaseBus UseLogging()
+		{
+			_loggingConfigurer = configurer => configurer.Console();
 
-        public override BaseBus UseLogging()
-        {
-            _loggingConfigurer = configurer => configurer.Console();
+			return this;
+		}
 
-            return this;
-        }
+		private void ConfigureAzureSendBus(bool isAScript)
+		{
+			Action<RebusTransportConfigurer> transportConfig;
+			if (!isAScript)
+			{
+				transportConfig = configurer => configurer.UseAzureServiceBusInOneWayClientMode(_azureConnectionString);
+			}
+			else
+			{
+				transportConfig =
+					configurer =>
+						configurer.UseAzureServiceBus(_azureConnectionString, string.Format("{0}.reply", _endpoint),
+							string.Format("{0}.reply.error", _endpoint));
+			}
 
-        private void ConfigureAzureSendBus()
-        {
-            SendBus = Configure.With(Container)
-                .Logging(_loggingConfigurer)
-                .Serialization(serializer => serializer.UseJsonSerializer()
-                    .AddNameResolver(
-                        x => x.Assembly.GetName().Name.Contains("ℛ")
-                            ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
-                            : null))
-                        .Transport(configurer => configurer.UseAzureServiceBusInOneWayClientMode(_azureConnectionString))
-                .CreateBus()
-                .Start();
-        }
+			SendBus = Configure.With(Container)
+				.Logging(_loggingConfigurer)
+				.Serialization(serializer => serializer.UseJsonSerializer()
+					.AddNameResolver(
+						x => x.Assembly.GetName().Name.Contains("ℛ")
+							? new TypeDescriptor("ScriptCs.Compiled", x.Name)
+							: null))
+						.Transport(transportConfig)
+				.CreateBus()
+				.Start();
+		}
 
-        private void ConfigureAzureReceiveBus()
-        {
-            ReceiveBus = Configure.With(Container)
-                .Logging(_loggingConfigurer)
-                .Serialization(serializer => serializer.UseJsonSerializer()
-                    .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
-                .Transport(
-                    configurer =>
-                        configurer.UseAzureServiceBus(_azureConnectionString, _endpoint, string.Format("{0}.error", _endpoint)))
-                .CreateBus()
-                .Start();
+		private void ConfigureAzureReceiveBus()
+		{
+			ReceiveBus = Configure.With(Container)
+				.Logging(_loggingConfigurer)
+				.Serialization(serializer => serializer.UseJsonSerializer()
+					.AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
+				.Transport(
+					configurer =>
+						configurer.UseAzureServiceBus(_azureConnectionString, _endpoint, string.Format("{0}.error", _endpoint)))
+				.CreateBus()
+				.Start();
 
-        }
-    }
+		}
+	}
 }

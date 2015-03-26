@@ -114,7 +114,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			return replyBus;
 		}
 
-		private DefaultExecutionScript CreateExecutableScript(FileInfo script, LogLevel logLevel)
+		private WebApiControllerScript CreateExecutableScript(FileInfo script, LogLevel logLevel)
 		{
 			return new WebApiControllerScript
 			{

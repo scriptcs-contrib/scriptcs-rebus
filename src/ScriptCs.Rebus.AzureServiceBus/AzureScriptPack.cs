@@ -8,9 +8,19 @@ namespace ScriptCs.Rebus.AzureServiceBus
         {
             Guard.AgainstNullArgument("session", session);
 
+			// Rebus namespaces
             session.ImportNamespace("Rebus.AzureServiceBus");
-            session.ImportNamespace("ScriptCs.Rebus.AzureServiceBus");
-        }
+
+			//ScriptCs namespaces
+			session.ImportNamespace("ScriptCs.Contracts");
+
+			// Local namespaces
+			session.ImportNamespace("ScriptCs.Rebus.AzureServiceBus");
+			session.ImportNamespace("ScriptCs.Rebus.Scripts");
+			session.ImportNamespace("ScriptCs.Rebus.Configuration");
+			session.ImportNamespace("ScriptCs.Rebus.Extensions");
+			session.ImportNamespace("ScriptCs.Rebus.Logging");
+		}
 
         public IScriptPackContext GetContext()
         {

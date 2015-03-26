@@ -9,26 +9,19 @@ namespace ScriptCs.Rebus.RabbitMQ
 {
     public class RabbitMqBus : BaseBus
     {
-        private readonly string _endpoint;
         private readonly string _rabbitConnectionString;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
 
         public RabbitMqBus(string endpoint, string connectionString)
         {
-            Guard.AgainstNullArgument("endpoint", endpoint);
             Guard.AgainstNullArgument("connectionString", connectionString);
-            
-            _endpoint = endpoint;
+
+	        Endpoint = endpoint;
             _rabbitConnectionString = connectionString;
             Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
-
-	    public override void RegisterHandler(Func<IHandleMessages> messageHandler)
-	    {
-		    throw new NotImplementedException();
-	    }
 
 	    public override void Send<T>(T message)
         {
@@ -42,7 +35,7 @@ namespace ScriptCs.Rebus.RabbitMQ
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
             Console.Write("Sending message of type {0}...", message.GetType().Name);
-            SendBus.Advanced.Routing.Send(_endpoint, message);
+            SendBus.Advanced.Routing.Send(Endpoint, message);
             Console.WriteLine("sent.");
 
 			ShutDown();
@@ -65,7 +58,7 @@ namespace ScriptCs.Rebus.RabbitMQ
                 ConfigureRabbitReceiveBus();
             }
 
-            Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
+            Console.WriteLine("Awaiting messsage on {0}...", Endpoint);
         }
 
         public override BaseBus UseLogging()
@@ -95,7 +88,7 @@ namespace ScriptCs.Rebus.RabbitMQ
                 .Logging(_loggingConfigurer)
                 .Serialization(serializer => serializer.UseJsonSerializer()
                     .AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
-                .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, _endpoint, string.Format("{0}.error", _endpoint)))
+                .Transport(configurer => configurer.UseRabbitMq(_rabbitConnectionString, Endpoint, string.Format("{0}.error", Endpoint)))
                 .CreateBus()
                 .Start();
         }
