@@ -20,7 +20,6 @@ namespace ScriptCs.Rebus.Configuration
 		private readonly List<string> _localDependencies;
 		private readonly List<IReceiveLogEntries> _logEntryHandlers;
 		private bool _useMono;
-		private IExecutionScript _executionScript;
 
 		public ScriptConfiguration(BaseBus baseBus, string script, string endpoint)
 		{
@@ -37,17 +36,6 @@ namespace ScriptCs.Rebus.Configuration
 			_useMono = false;
 
 			CreateLogBus();
-		}
-
-		public ScriptConfiguration(BaseBus baseBus, IExecutionScript script,
-			string endpoint) : this(baseBus, script.ScriptContent, endpoint)
-		{
-			_executionScript = script;
-		}
-
-		public ScriptConfiguration()
-		{
-			throw new NotImplementedException();
 		}
 
 		public ScriptConfiguration ImportNamespace(string namespaceName)
@@ -84,8 +72,6 @@ namespace ScriptCs.Rebus.Configuration
 
 		public void Send()
 		{
-			_baseBus.Send(_executionScript);
-
 			_baseBus.Send(new DefaultExecutionScript
 			{
 				ScriptContent = _script,
