@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using Rebus;
+using Rebus.AzureServiceBus;
 using Rebus.Configuration;
+using Rebus.RabbitMQ;
 using Rebus.Transports.Msmq;
 using ScriptCs.Rebus.Scripts;
 
@@ -13,7 +15,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 	    {
 		    var bus =
 			    CreateReplyBus(
-				    MessageContext.GetCurrent().Headers["transport"].ToString());
+				    MessageContext.GetCurrent().Headers["transport"].ToString(), MessageContext.GetCurrent().Headers["connectionString"].ToString());
 			
 			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, "Script received...");
 
@@ -47,11 +49,18 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, "Script saved...");
         }
 
-		private IBus CreateReplyBus(string transport)
+		private IBus CreateReplyBus(string transport, string connectionString)
 		{
 			Action<RebusTransportConfigurer> transportConfig;
 			switch (transport)
 			{
+				case "AZURE":
+					transportConfig =
+						configurer => configurer.UseAzureServiceBusInOneWayClientMode(connectionString);
+					break;
+				case "RABBIT":
+					transportConfig = configurer => configurer.UseRabbitMqInOneWayMode(connectionString);
+					break;
 				default:
 					transportConfig = configurer => configurer.UseMsmqInOneWayClientMode();
 					break;

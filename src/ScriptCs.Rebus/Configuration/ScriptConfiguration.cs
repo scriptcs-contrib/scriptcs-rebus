@@ -13,64 +13,50 @@ namespace ScriptCs.Rebus.Configuration
 	public class ScriptConfiguration
 	{
 		private readonly BaseBus _baseBus;
-		private readonly string _script;
 		private readonly string _endpoint;
-		private readonly List<string> _namespaces;
-		private readonly List<string> _nugetDependencies;
-		private readonly List<string> _localDependencies;
+		internal readonly List<string> Namespaces;
+		internal readonly List<string> NugetDependencies;
+		internal readonly List<string> LocalDependencies;
 		private readonly List<IReceiveLogEntries> _logEntryHandlers;
-		private bool _useMono;
-		private IExecutionScript _executionScript;
+		internal bool UseMonoVar;
+		internal string ScriptContent;
 
-		public ScriptConfiguration(BaseBus baseBus, string script, string endpoint)
+		public ScriptConfiguration(BaseBus baseBus, string endpoint)
 		{
 			if (baseBus == null) throw new ArgumentNullException("baseBus");
-			if (script == null) throw new ArgumentNullException("script");
 			if (endpoint == null) throw new ArgumentNullException("endpoint");
 			_baseBus = baseBus;
-			_script = script;
 			_endpoint = endpoint;
-			_namespaces = new List<string>();
-			_nugetDependencies = new List<string>();
-			_localDependencies = new List<string>();
+			Namespaces = new List<string>();
+			NugetDependencies = new List<string>();
+			LocalDependencies = new List<string>();
 			_logEntryHandlers = new List<IReceiveLogEntries>();
-			_useMono = false;
+			UseMonoVar = false;
 
 			CreateLogBus();
 		}
 
-		public ScriptConfiguration(BaseBus baseBus, IExecutionScript script,
-			string endpoint) : this(baseBus, script.ScriptContent, endpoint)
-		{
-			_executionScript = script;
-		}
-
-		public ScriptConfiguration()
-		{
-			throw new NotImplementedException();
-		}
-
 		public ScriptConfiguration ImportNamespace(string namespaceName)
 		{
-			_namespaces.Add(namespaceName);
+			Namespaces.Add(namespaceName);
 			return this;
 		}
 
 		public ScriptConfiguration AddFromNuGet(string nugetDependency)
 		{
-			_nugetDependencies.Add(nugetDependency);
+			NugetDependencies.Add(nugetDependency);
 			return this;
 		}
 
 		public ScriptConfiguration AddLocal(string localDependency)
 		{
-			_localDependencies.Add(localDependency);
+			LocalDependencies.Add(localDependency);
 			return this;
 		}
 
 		public ScriptConfiguration UseMono()
 		{
-			_useMono = true;
+			UseMonoVar = true;
 			return this;
 		}
 
@@ -84,33 +70,31 @@ namespace ScriptCs.Rebus.Configuration
 
 		public void Send()
 		{
-			_baseBus.Send(_executionScript);
-
 			_baseBus.Send(new DefaultExecutionScript
 			{
-				ScriptContent = _script,
-				NuGetDependencies = _nugetDependencies.ToArray(),
+				ScriptContent = ScriptContent,
+				NuGetDependencies = NugetDependencies.ToArray(),
 
-				Namespaces = _namespaces.ToArray(),
-				LocalDependencies = _localDependencies.ToArray(),
-				UseMono = _useMono,
-				LogLevel = GetLogLevel(_logEntryHandlers)
+				Namespaces = Namespaces.ToArray(),
+				LocalDependencies = LocalDependencies.ToArray(),
+				UseMono = UseMonoVar,
+				LogLevel = GetLogLevel()
 			});
 		}
 
-		private LogLevel GetLogLevel(List<IReceiveLogEntries> logEntryHandlers)
+		internal LogLevel GetLogLevel()
 		{
-			if (logEntryHandlers.Any(x => x.LogLevel == LogLevel.Trace))
+			if (_logEntryHandlers.Any(x => x.LogLevel == LogLevel.Trace))
 			{
 				return LogLevel.Trace;
 			}
 
-			if (logEntryHandlers.Any(x => x.LogLevel == LogLevel.Debug))
+			if (_logEntryHandlers.Any(x => x.LogLevel == LogLevel.Debug))
 			{
 				return LogLevel.Debug;
 			}
 
-			if (logEntryHandlers.Any(x => x.LogLevel == LogLevel.Error))
+			if (_logEntryHandlers.Any(x => x.LogLevel == LogLevel.Error))
 			{
 				return LogLevel.Error;
 			}
@@ -190,6 +174,11 @@ namespace ScriptCs.Rebus.Configuration
 						string.Format("{0}.reply.error", _endpoint)))
 				.CreateBus()
 				.Start();
+		}
+
+		public ScriptConfiguration Configuration(DefaultExecutionScript defaultExecutionScript)
+		{
+			throw new NotImplementedException();
 		}
 	}
 

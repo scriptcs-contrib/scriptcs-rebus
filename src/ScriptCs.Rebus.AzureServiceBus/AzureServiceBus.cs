@@ -27,6 +27,11 @@ namespace ScriptCs.Rebus.AzureServiceBus
 			Container = new BuiltinContainerAdapter();
 		}
 
+		public void RegisterHandler(IHandleMessages messageHandler)
+		{
+			Container.Register(() => messageHandler);
+		}
+
 		public override void Send<T>(T message)
         {
             Guard.AgainstNullArgument("message", message);

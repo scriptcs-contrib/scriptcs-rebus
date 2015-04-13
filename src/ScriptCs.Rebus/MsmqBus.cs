@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Globalization;
-using System.Reflection;
-using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
 using Rebus.Transports.Msmq;
 using ScriptCs.Rebus.Configuration;
-using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus
 {
@@ -15,18 +11,25 @@ namespace ScriptCs.Rebus
     {
         private Action<LoggingConfigurer> _loggingConfigurer;
 
-        public MsmqBus(string endpoint)
+	    public MsmqBus(string endpoint)
         {
 	        Endpoint = endpoint;
 	        Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
 
+		public void RegisterHandler<THandler>(Func<THandler> messageHandler)
+		{
+			Container.Register(messageHandler);
+		}
+
 	    public override void Send<T>(T message)
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-	        var isAScript = message.GetType() == typeof(IExecutionScript) || message.GetType().BaseType == typeof(IExecutionScript);
+
+		    var isAScript = typeof (IExecutionScript).IsAssignableFrom(message.GetType());
+
 	        if (SendBus == null)
 	        {
 		        ConfigureSendBus(isAScript);

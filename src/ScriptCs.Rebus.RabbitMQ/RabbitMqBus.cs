@@ -13,8 +13,7 @@ namespace ScriptCs.Rebus.RabbitMQ
         private readonly string _rabbitConnectionString;
         private Action<LoggingConfigurer> _loggingConfigurer;
 
-
-        public RabbitMqBus(string endpoint, string connectionString)
+	    public RabbitMqBus(string endpoint, string connectionString)
         {
             Guard.AgainstNullArgument("connectionString", connectionString);
 
@@ -24,7 +23,12 @@ namespace ScriptCs.Rebus.RabbitMQ
             _loggingConfigurer = configurer => configurer.None();
         }
 
-	    public override void Send<T>(T message)
+		public void RegisterHandler(IHandleMessages messageHandler)
+		{
+			Container.Register(() => messageHandler);
+		}
+		
+		public override void Send<T>(T message)
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 

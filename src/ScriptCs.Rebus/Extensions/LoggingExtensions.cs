@@ -22,6 +22,7 @@ namespace ScriptCs.Rebus.Extensions
 		{
 			if (loggingConfiguration == null)
 				throw new ArgumentNullException("loggingConfiguration");
+			Console.WriteLine("in ToConsole...");
 
 			return loggingConfiguration.Logger(new ConsoleLogger(logLevel));
 		}
