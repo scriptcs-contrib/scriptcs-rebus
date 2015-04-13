@@ -27,6 +27,11 @@ namespace ScriptCs.Rebus.AzureServiceBus
 			Container = new BuiltinContainerAdapter();
 		}
 
+		public void RegisterHandler(IHandleMessages messageHandler)
+		{
+			Container.Register(() => messageHandler);
+		}
+
 		public override void Send<T>(T message)
         {
             Guard.AgainstNullArgument("message", message);
@@ -39,11 +44,17 @@ namespace ScriptCs.Rebus.AzureServiceBus
 
             Guard.AgainstNullArgument("_sendBus", SendBus);
 
-            Console.Write("Sending message of type {0}...", message.GetType().Name);
+			// Add header information
+			if (isAScript)
+			{
+				SendBus.AttachHeader(message, "connectionString", _azureConnectionString);
+				SendBus.AttachHeader(message, "transport", "AZURE");
+			}
+			
+			Console.Write("Sending message of type {0}...", message.GetType().Name);
 
 			try
 			{
-				SendBus.AttachHeader(message, "transport", "AZURE");
 				SendBus.Advanced.Routing.Send(_endpoint, message);
 			}
 			catch (Exception e)

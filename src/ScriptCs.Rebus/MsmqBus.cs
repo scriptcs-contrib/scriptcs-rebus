@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Globalization;
-using System.Reflection;
-using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
 using Rebus.Transports.Msmq;
-using ScriptCs.Rebus.Scripts;
+using ScriptCs.Rebus.Configuration;
 
 namespace ScriptCs.Rebus
 {
@@ -14,29 +11,41 @@ namespace ScriptCs.Rebus
     {
         private Action<LoggingConfigurer> _loggingConfigurer;
 
-        public MsmqBus(string endpoint)
+	    public MsmqBus(string endpoint)
         {
 	        Endpoint = endpoint;
 	        Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
 
+		public void RegisterHandler<THandler>(Func<THandler> messageHandler)
+		{
+			Container.Register(messageHandler);
+		}
+
 	    public override void Send<T>(T message)
         {
             Guard.AgainstNullArgumentIfNullable("message", message);
 
-	        var isAScript = message.GetType() == typeof(DefaultExecutionScript) || message.GetType().BaseType == typeof(DefaultExecutionScript);
+
+		    var isAScript = typeof (IExecutionScript).IsAssignableFrom(message.GetType());
+
 	        if (SendBus == null)
 	        {
 		        ConfigureSendBus(isAScript);
 	        }
 
 		    Guard.AgainstNullArgument("_sendBus", SendBus);
+		    
+			// Add header information
+		    if (isAScript)
+		    {
+			    SendBus.AttachHeader(message, "transport", "MSMQ");
+		    }
 
-            Console.Write("Sending message of type {0}...", message.GetType().Name);
+		    Console.Write("Sending message of type {0}...", message.GetType().Name);
             try
             {
-				SendBus.AttachHeader(message, "transport", "MSMQ");
                 SendBus.Advanced.Routing.Send(Endpoint, message);
             }
             catch (Exception e)

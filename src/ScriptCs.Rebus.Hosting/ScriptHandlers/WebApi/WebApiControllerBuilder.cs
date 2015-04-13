@@ -8,7 +8,9 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using NuGet;
 using Rebus;
+using Rebus.AzureServiceBus;
 using Rebus.Configuration;
+using Rebus.RabbitMQ;
 using Rebus.Transports.Msmq;
 using ScriptCs.Contracts;
 using ScriptCs.Rebus.Scripts;
@@ -45,10 +47,11 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 					var replyAddress = metadata[0].Trim();
 					var transport = metadata[1].Trim();
 					var logLevel = ToLogLevel(metadata[2].Trim());
-					var bus = CreateReplyBus(transport, logLevel);
+					var connectionString = metadata.Count() == 4 ? metadata[3].Trim() : string.Empty;
+					var bus = CreateReplyBus(transport, connectionString);
 
 					ScriptExecutor.Init(CreateExecutableScript(script, logLevel),
-						reply => bus.Publish(reply));
+						reply => bus.Advanced.Routing.Send(replyAddress, reply));
 
 					ScriptExecutor.ScriptServicesBuilder.FileSystem<FileSystem>();
 					ScriptExecutor.ScriptServicesBuilder
@@ -95,13 +98,25 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			}
 		}
 
-		private IBus CreateReplyBus(string transport, LogLevel logLevel)
+		private IBus CreateReplyBus(string transport, string connectionString)
 		{
+			if (transport == null) throw new ArgumentNullException("transport");
+			if (connectionString == null)
+				throw new ArgumentNullException("connectionString");
+
 			Action<RebusTransportConfigurer> transportConfig;
 			switch (transport)
 			{
+				case "RABBIT":
+					transportConfig = configurer => configurer.UseRabbitMqInOneWayMode(connectionString);
+					break;
+				case "AZURE":
+					transportConfig =
+						configurer => configurer.UseAzureServiceBusInOneWayClientMode(connectionString);
+					break;
 				default:
-					transportConfig = configurer => configurer.UseMsmqInOneWayClientMode();
+					transportConfig =
+						configurer => configurer.UseMsmqInOneWayClientMode();
 					break;
 			}
 
