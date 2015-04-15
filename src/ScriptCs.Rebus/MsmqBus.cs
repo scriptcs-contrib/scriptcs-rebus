@@ -9,11 +9,17 @@ namespace ScriptCs.Rebus
 {
     public class MsmqBus : BaseBus
     {
-        private Action<LoggingConfigurer> _loggingConfigurer;
+	    private readonly RebusScriptBus _rebusScriptBus;
+	    private Action<LoggingConfigurer> _loggingConfigurer;
+
+	    internal MsmqBus(string endpoint, RebusScriptBus rebusScriptBus) : this(endpoint)
+	    {
+		    _rebusScriptBus = rebusScriptBus;
+	    }
 
 	    public MsmqBus(string endpoint)
         {
-	        Endpoint = endpoint;
+		    Endpoint = endpoint;
 	        Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
@@ -57,10 +63,16 @@ namespace ScriptCs.Rebus
 				ShutDown();
             }
 
-            Console.WriteLine("sent.");
+			ShutDown();
 
-	        ShutDown();
+            Console.WriteLine("sent.");
         }
+
+		//public override void ShutDown()
+		//{
+		//	base.ShutDown();
+		//	//_rebusScriptBus.Dispose();
+		//}
 
 	    public override BaseBus Receive<T>(Action<T> action)
         {

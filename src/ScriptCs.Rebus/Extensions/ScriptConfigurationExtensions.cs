@@ -10,39 +10,35 @@ namespace ScriptCs.Rebus.Extensions
 		public static ScriptConfiguration AScript(
 			this ScriptConfiguration scriptConfiguration, string script)
 		{
-			scriptConfiguration.ScriptContent = script;
-			return scriptConfiguration;
+			return
+				scriptConfiguration.Configuration(
+					() => scriptConfiguration.Bus.Send(new DefaultExecutionScript
+					{
+						ScriptContent = script,
+						NuGetDependencies = scriptConfiguration.NugetDependencies.ToArray(),
 
-			//return scriptConfiguration.Configuration(new DefaultExecutionScript
-			//{
-			//	ScriptContent = script,
-			//	NuGetDependencies = scriptConfiguration.NugetDependencies.ToArray(),
-
-			//	Namespaces = scriptConfiguration.Namespaces.ToArray(),
-			//	LocalDependencies = scriptConfiguration.LocalDependencies.ToArray(),
-			//	UseMono = scriptConfiguration.UseMonoVar,
-
-			//	// Internalize method
-			//	LogLevel = scriptConfiguration.GetLogLevel()
-			//});
+						Namespaces = scriptConfiguration.Namespaces.ToArray(),
+						LocalDependencies = scriptConfiguration.LocalDependencies.ToArray(),
+						UseMono = scriptConfiguration.UseMonoVar,
+						LogLevel = scriptConfiguration.GetLogLevel()
+					}));
 		}
 
 		public static ScriptConfiguration AScriptFile(this ScriptConfiguration scriptConfiguration,
 			string scriptFile)
 		{
-			scriptConfiguration.ScriptContent = File.ReadAllText(scriptFile);
-			return scriptConfiguration;
+			return
+				scriptConfiguration.Configuration(
+					() => scriptConfiguration.Bus.Send(new DefaultExecutionScript
+					{
+						ScriptContent = File.ReadAllText(scriptFile),
+						NuGetDependencies = scriptConfiguration.NugetDependencies.ToArray(),
 
-			//return scriptConfiguration.Configuration(new DefaultExecutionScript
-			//{
-			//	ScriptContent = File.ReadAllText(scriptFile),
-			//	NuGetDependencies = scriptConfiguration.NugetDependencies.ToArray(),
-
-			//	Namespaces = scriptConfiguration.Namespaces.ToArray(),
-			//	LocalDependencies = scriptConfiguration.LocalDependencies.ToArray(),
-			//	UseMono = scriptConfiguration.UseMonoVar,
-			//	LogLevel = scriptConfiguration.GetLogLevel()
-			//});
+						Namespaces = scriptConfiguration.Namespaces.ToArray(),
+						LocalDependencies = scriptConfiguration.LocalDependencies.ToArray(),
+						UseMono = scriptConfiguration.UseMonoVar,
+						LogLevel = scriptConfiguration.GetLogLevel()
+					}));
 		}
 	}
 }

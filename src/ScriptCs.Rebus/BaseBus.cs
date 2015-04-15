@@ -7,7 +7,7 @@ using ScriptCs.Rebus.Configuration;
 
 namespace ScriptCs.Rebus
 {
-    public abstract class BaseBus : IDisposable
+    public abstract class BaseBus
     {
         protected internal IBus SendBus;
 	    protected internal IBus ReceiveBus;
@@ -25,7 +25,7 @@ namespace ScriptCs.Rebus
 
         public abstract BaseBus UseLogging();
 
-        protected void ShutDown()
+        public virtual void ShutDown()
         {
             if (SendBus != null) SendBus.Dispose();
             if (ReceiveBus != null) ReceiveBus.Dispose();
@@ -45,10 +45,5 @@ namespace ScriptCs.Rebus
 		{
 			get { return new ScriptConfiguration(this, Endpoint); }
 		}
-			
-	    public void Dispose()
-	    {
-		    ShutDown();
-	    }
     }
 }

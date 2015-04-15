@@ -13,7 +13,10 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers
 	{
 		public void Handle(DefaultExecutionScript message)
 		{
-			var bus = CreateReplyBus(MessageContext.GetCurrent().Headers["transport"].ToString(), MessageContext.GetCurrent().Headers["connectionString"].ToString());
+			var bus =
+				CreateReplyBus(
+					MessageContext.GetCurrent().Headers["transport"].ToString(),
+					MessageContext.GetCurrent().Headers["connectionString"].ToString());
 
 			ScriptExecutor.Init(message, reply => bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, reply));
 

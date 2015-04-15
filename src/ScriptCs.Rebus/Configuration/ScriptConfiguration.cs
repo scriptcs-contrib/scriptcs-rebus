@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Transports.Msmq;
@@ -12,7 +13,7 @@ namespace ScriptCs.Rebus.Configuration
 {
 	public class ScriptConfiguration
 	{
-		private readonly BaseBus _baseBus;
+		internal readonly BaseBus Bus;
 		private readonly string _endpoint;
 		internal readonly List<string> Namespaces;
 		internal readonly List<string> NugetDependencies;
@@ -20,12 +21,13 @@ namespace ScriptCs.Rebus.Configuration
 		private readonly List<IReceiveLogEntries> _logEntryHandlers;
 		internal bool UseMonoVar;
 		internal string ScriptContent;
+		private Action _sendScript;
 
-		public ScriptConfiguration(BaseBus baseBus, string endpoint)
+		public ScriptConfiguration(BaseBus bus, string endpoint)
 		{
-			if (baseBus == null) throw new ArgumentNullException("baseBus");
+			if (bus == null) throw new ArgumentNullException("bus");
 			if (endpoint == null) throw new ArgumentNullException("endpoint");
-			_baseBus = baseBus;
+			Bus = bus;
 			_endpoint = endpoint;
 			Namespaces = new List<string>();
 			NugetDependencies = new List<string>();
@@ -70,16 +72,7 @@ namespace ScriptCs.Rebus.Configuration
 
 		public void Send()
 		{
-			_baseBus.Send(new DefaultExecutionScript
-			{
-				ScriptContent = ScriptContent,
-				NuGetDependencies = NugetDependencies.ToArray(),
-
-				Namespaces = Namespaces.ToArray(),
-				LocalDependencies = LocalDependencies.ToArray(),
-				UseMono = UseMonoVar,
-				LogLevel = GetLogLevel()
-			});
+			_sendScript();
 		}
 
 		internal LogLevel GetLogLevel()
@@ -116,7 +109,8 @@ namespace ScriptCs.Rebus.Configuration
 							break;
 						case ScriptExecutionLifetime.Terminated:
 							Console.WriteLine("Finished script execution...");
-							_baseBus.Dispose();
+							//if (_logBus != null) _logBus.Dispose();
+							Bus.ShutDown();
 							break;
 					}
 				});
@@ -176,9 +170,11 @@ namespace ScriptCs.Rebus.Configuration
 				.Start();
 		}
 
-		public ScriptConfiguration Configuration(DefaultExecutionScript defaultExecutionScript)
+		internal ScriptConfiguration Configuration(Action executionScript)
 		{
-			throw new NotImplementedException();
+			_sendScript = executionScript;
+
+			return this;
 		}
 	}
 

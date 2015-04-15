@@ -52,6 +52,7 @@
     <Compile Include="Configuration\ScriptLoggingConfiguration.cs" />
     <Compile Include="Extensions\LoggingExtensions.cs" />
     <Compile Include="Extensions\ScriptConfigurationExtensions.cs" />
+    <Compile Include="Extensions\WebApiExtensions.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="BaseBus.cs" />
     <Compile Include="Logging\IReceiveLogEntries.cs" />

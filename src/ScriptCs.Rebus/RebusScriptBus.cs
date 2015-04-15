@@ -1,13 +1,36 @@
-﻿using ScriptCs.Contracts;
+﻿using System;
+using ScriptCs.Contracts;
 
 namespace ScriptCs.Rebus
 {
     public class RebusScriptBus : IScriptPackContext
     {
-        public BaseBus ConfigureBus(string endpoint)
+	    private MsmqBus _msmqBus;
+
+	    public BaseBus ConfigureBus(string endpoint)
         {
-            return new MsmqBus(endpoint);
+	        _msmqBus = new MsmqBus(endpoint, this);
+	        return _msmqBus;
         }
+
+		//public void Dispose()
+		//{
+		//	this.Dispose(true);
+		//	GC.SuppressFinalize(this);
+		//}
+
+		//protected virtual void Dispose(bool disposing)
+		//{
+		//	if (disposing)
+		//	{
+		//		//this.ShutDown();
+		//	}
+		//}
+
+		//private void ShutDown()
+		//{
+		//	_msmqBus.ShutDown();
+		//}
     }
 
 }
