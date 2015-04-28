@@ -1,4 +1,5 @@
 ﻿using System;
+using Rebus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
@@ -9,30 +10,25 @@ namespace ScriptCs.Rebus
 {
     public class MsmqBus : BaseBus
     {
-	    private readonly RebusScriptBus _rebusScriptBus;
 	    private Action<LoggingConfigurer> _loggingConfigurer;
-
-	    internal MsmqBus(string endpoint, RebusScriptBus rebusScriptBus) : this(endpoint)
-	    {
-		    _rebusScriptBus = rebusScriptBus;
-	    }
 
 	    public MsmqBus(string endpoint)
         {
-		    Endpoint = endpoint;
+			Guard.AgainstNullArgument("endpoint", endpoint);
+
+			Endpoint = endpoint;
 	        Container = new BuiltinContainerAdapter();
             _loggingConfigurer = configurer => configurer.None();
         }
 
-		public void RegisterHandler<THandler>(Func<THandler> messageHandler)
+		public void RegisterHandler(IHandleMessages messageHandler)
 		{
-			Container.Register(messageHandler);
+			Container.Register(() => messageHandler);
 		}
 
 	    public override void Send<T>(T message)
         {
-            Guard.AgainstNullArgumentIfNullable("message", message);
-
+            Guard.AgainstNullArgument("message", message);
 
 		    var isAScript = typeof (IExecutionScript).IsAssignableFrom(message.GetType());
 
@@ -63,16 +59,10 @@ namespace ScriptCs.Rebus
 				ShutDown();
             }
 
-			ShutDown();
-
             Console.WriteLine("sent.");
-        }
-
-		//public override void ShutDown()
-		//{
-		//	base.ShutDown();
-		//	//_rebusScriptBus.Dispose();
-		//}
+		
+			ShutDown();
+		}
 
 	    public override BaseBus Receive<T>(Action<T> action)
         {

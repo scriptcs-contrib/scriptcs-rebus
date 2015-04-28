@@ -9,7 +9,7 @@ namespace ScriptCs.Rebus
 
 	    public BaseBus ConfigureBus(string endpoint)
         {
-	        _msmqBus = new MsmqBus(endpoint, this);
+	        _msmqBus = new MsmqBus(endpoint);
 	        return _msmqBus;
         }
 

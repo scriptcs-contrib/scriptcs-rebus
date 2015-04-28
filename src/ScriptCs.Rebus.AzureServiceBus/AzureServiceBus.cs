@@ -4,13 +4,13 @@ using Rebus.AzureServiceBus;
 using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Serialization.Json;
+using ScriptCs.Rebus.Configuration;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus.AzureServiceBus
 {
 	public class AzureServiceBus : BaseBus
 	{
-		private readonly string _endpoint;
 		private readonly string _azureConnectionString;
 		private Action<LoggingConfigurer> _loggingConfigurer;
 
@@ -20,7 +20,6 @@ namespace ScriptCs.Rebus.AzureServiceBus
 			Guard.AgainstNullArgument("azureConnectionString", azureConnectionString);
 
 			Endpoint = endpoint;
-			_endpoint = endpoint;
 			_azureConnectionString = azureConnectionString;
 			_loggingConfigurer = configurer => configurer.None();
 
@@ -36,7 +35,8 @@ namespace ScriptCs.Rebus.AzureServiceBus
         {
             Guard.AgainstNullArgument("message", message);
 
-			var isAScript = message.GetType() == typeof(DefaultExecutionScript) || message.GetType().BaseType == typeof(DefaultExecutionScript);
+			var isAScript = typeof(IExecutionScript).IsAssignableFrom(message.GetType());
+
 			if (SendBus == null)
             {
                 ConfigureAzureSendBus(isAScript);
@@ -55,7 +55,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
 
 			try
 			{
-				SendBus.Advanced.Routing.Send(_endpoint, message);
+				SendBus.Send(message);
 			}
 			catch (Exception e)
 			{
@@ -88,7 +88,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
 				ConfigureAzureReceiveBus();
 			}
 
-			Console.WriteLine("Awaiting messsage on {0}...", _endpoint);
+			Console.WriteLine("Awaiting messsage on {0}...", Endpoint);
 		}
 
 		public override BaseBus UseLogging()
@@ -109,12 +109,13 @@ namespace ScriptCs.Rebus.AzureServiceBus
 			{
 				transportConfig =
 					configurer =>
-						configurer.UseAzureServiceBus(_azureConnectionString, string.Format("{0}.reply", _endpoint),
-							string.Format("{0}.reply.error", _endpoint));
+						configurer.UseAzureServiceBus(_azureConnectionString, string.Format("{0}.reply", Endpoint),
+							string.Format("{0}.reply.error", Endpoint));
 			}
 
 			SendBus = Configure.With(Container)
 				.Logging(_loggingConfigurer)
+				.MessageOwnership(ownership => ownership.Use(new ScriptedOwnership(Endpoint)))
 				.Serialization(serializer => serializer.UseJsonSerializer()
 					.AddNameResolver(
 						x => x.Assembly.GetName().Name.Contains("ℛ")
@@ -133,7 +134,7 @@ namespace ScriptCs.Rebus.AzureServiceBus
 					.AddTypeResolver(x => x.AssemblyName == "ScriptCs.Compiled" ? KnownTypes[x.TypeName] : null))
 				.Transport(
 					configurer =>
-						configurer.UseAzureServiceBus(_azureConnectionString, _endpoint, string.Format("{0}.error", _endpoint)))
+						configurer.UseAzureServiceBus(_azureConnectionString, Endpoint, string.Format("{0}.error", Endpoint)))
 				.CreateBus()
 				.Start();
 
