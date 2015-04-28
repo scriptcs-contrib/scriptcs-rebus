@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
+using Newtonsoft.Json;
 using NuGet;
 using Rebus;
 using Rebus.AzureServiceBus;
@@ -40,17 +41,16 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 
 				foreach (var script in scripts)
 				{
-
 					var metadata =
 						File.ReadAllLines(script.FullName + ".metadata")[0].Split(':');
 
 					var replyAddress = metadata[0].Trim();
 					var transport = metadata[1].Trim();
-					var logLevel = ToLogLevel(metadata[2].Trim());
+					var receivedScript = JsonConvert.DeserializeObject<WebApiControllerScript>(metadata[2].Trim());
 					var connectionString = metadata.Count() == 4 ? metadata[3].Trim() : string.Empty;
 					var bus = CreateReplyBus(transport, connectionString);
 
-					ScriptExecutor.Init(CreateExecutableScript(script, logLevel),
+					ScriptExecutor.Init(ModifyReceivedScript(script, receivedScript),
 						reply => bus.Advanced.Routing.Send(replyAddress, reply));
 
 					ScriptExecutor.ScriptServicesBuilder.FileSystem<FileSystem>();
@@ -129,16 +129,18 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			return replyBus;
 		}
 
-		private WebApiControllerScript CreateExecutableScript(FileInfo script, LogLevel logLevel)
+		private WebApiControllerScript ModifyReceivedScript(FileInfo script, WebApiControllerScript receivedScript)
 		{
-			return new WebApiControllerScript
+			receivedScript.ScriptContent = File.ReadAllText(script.FullName);
+			receivedScript.LocalDependencies.AddRange(new[]
 			{
-				ScriptContent = File.ReadAllText(script.FullName),
-				LocalDependencies = new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin", "System.Web.Http.dll"), "System.Net.Http" },
-				NuGetDependencies = new string[0],
-				Namespaces = new [] {"System.Web.Http", "System.Net.Http"},
-				LogLevel = logLevel
-			};
+				Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin",
+					"System.Web.Http.dll"),
+				"System.Net.Http"
+			});
+			receivedScript.Namespaces.AddRange(new[] { "System.Web.Http", "System.Net.Http" });
+
+			return receivedScript;
 		}
 	}
 }

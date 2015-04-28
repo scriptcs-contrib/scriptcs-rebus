@@ -51,7 +51,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			    string.Format("{0} : {1} : {2} : {3}",
 				    MessageContext.GetCurrent().ReturnAddress,
 				    MessageContext.GetCurrent().Headers["transport"],
-				    message.LogLevel.ToString().ToUpperInvariant(),
+				    JsonConvert.SerializeObject(message),
 				    connectionString));
 
 			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, new ScriptExecutionConsoleOutput("... script saved."));
