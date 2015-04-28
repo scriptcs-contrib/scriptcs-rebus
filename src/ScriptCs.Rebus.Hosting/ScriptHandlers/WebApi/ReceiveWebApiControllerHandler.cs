@@ -48,7 +48,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 			    string.Format("bin\\Scripts\\{0}Controller.csx.metadata", message.ControllerName));
 
 		    File.WriteAllText(metaDataPath,
-			    string.Format("{0} : {1} : {2} : {3}",
+				string.Format("{0} | {1} | {2} | {3}",
 				    MessageContext.GetCurrent().ReturnAddress,
 				    MessageContext.GetCurrent().Headers["transport"],
 				    JsonConvert.SerializeObject(message),

@@ -42,7 +42,7 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 				foreach (var script in scripts)
 				{
 					var metadata =
-						File.ReadAllLines(script.FullName + ".metadata")[0].Split(':');
+						File.ReadAllText(script.FullName + ".metadata").Split('|');
 
 					var replyAddress = metadata[0].Trim();
 					var transport = metadata[1].Trim();
@@ -132,13 +132,19 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 		private WebApiControllerScript ModifyReceivedScript(FileInfo script, WebApiControllerScript receivedScript)
 		{
 			receivedScript.ScriptContent = File.ReadAllText(script.FullName);
-			receivedScript.LocalDependencies.AddRange(new[]
+
+			var localDeps = receivedScript.LocalDependencies.ToList();
+			localDeps.AddRange(new[]
 			{
 				Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin",
 					"System.Web.Http.dll"),
 				"System.Net.Http"
 			});
-			receivedScript.Namespaces.AddRange(new[] { "System.Web.Http", "System.Net.Http" });
+			receivedScript.LocalDependencies = localDeps.ToArray();
+
+			var namespaces = receivedScript.Namespaces.ToList();
+			namespaces.AddRange(new[] { "System.Web.Http", "System.Net.Http" });
+			receivedScript.Namespaces = namespaces.ToArray();
 
 			return receivedScript;
 		}
