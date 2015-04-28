@@ -15,7 +15,8 @@ namespace ScriptCs.Rebus.RabbitMQ
 
 	    public RabbitMqBus(string endpoint, string connectionString)
         {
-            Guard.AgainstNullArgument("connectionString", connectionString);
+			Guard.AgainstNullArgument("endpoint", endpoint);
+			Guard.AgainstNullArgument("connectionString", connectionString);
 
 	        Endpoint = endpoint;
             _rabbitConnectionString = connectionString;
@@ -30,9 +31,9 @@ namespace ScriptCs.Rebus.RabbitMQ
 		
 		public override void Send<T>(T message)
         {
-            Guard.AgainstNullArgumentIfNullable("message", message);
+            Guard.AgainstNullArgument("message", message);
 
-			var isAScript = message.GetType() == typeof(IExecutionScript) || message.GetType().BaseType == typeof(IExecutionScript);
+			var isAScript = typeof(IExecutionScript).IsAssignableFrom(message.GetType());
 			if (SendBus == null)
             {
                 ConfigureRabbitSendBus(isAScript);
@@ -52,8 +53,7 @@ namespace ScriptCs.Rebus.RabbitMQ
 
 			try
 			{
-
-				SendBus.Advanced.Routing.Send(Endpoint, message);
+				SendBus.Send(message);
 			}
 			catch (Exception e)
 			{
@@ -115,7 +115,8 @@ namespace ScriptCs.Rebus.RabbitMQ
 
             SendBus = Configure.With(Container)
                 .Logging(_loggingConfigurer)
-                .Serialization(serializer => serializer.UseJsonSerializer()
+				.MessageOwnership(ownership => ownership.Use(new ScriptedOwnership(Endpoint)))
+				.Serialization(serializer => serializer.UseJsonSerializer()
                     .AddNameResolver(
                         x => x.Assembly.GetName().Name.Contains("ℛ")
                             ? new TypeDescriptor("ScriptCs.Compiled", x.Name)
