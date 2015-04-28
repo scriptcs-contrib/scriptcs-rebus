@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using Newtonsoft.Json;
 using Rebus;
 using Rebus.AzureServiceBus;
 using Rebus.Configuration;
 using Rebus.RabbitMQ;
 using Rebus.Transports.Msmq;
+using ScriptCs.Rebus.Logging;
 using ScriptCs.Rebus.Scripts;
 
 namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
@@ -13,11 +15,17 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
     {
 	    public void Handle(WebApiControllerScript message)
 	    {
-		    var bus =
+		    var connectionString =
+		    MessageContext.GetCurrent().Headers.ContainsKey("connectionString")
+			    ? MessageContext.GetCurrent().Headers["connectionString"].ToString()
+			    : string.Empty;
+		    
+			var bus =
 			    CreateReplyBus(
-				    MessageContext.GetCurrent().Headers["transport"].ToString(), MessageContext.GetCurrent().Headers["connectionString"].ToString());
-			
-			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, "Script received...");
+				    MessageContext.GetCurrent().Headers["transport"].ToString(),
+				    connectionString);
+				    
+					bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, new ScriptExecutionConsoleOutput("Script received..."));
 
 		    if (message == null) throw new ArgumentNullException("message");
 
@@ -44,12 +52,12 @@ namespace ScriptCs.Rebus.Hosting.ScriptHandlers.WebApi
 				    MessageContext.GetCurrent().ReturnAddress,
 				    MessageContext.GetCurrent().Headers["transport"],
 				    message.LogLevel.ToString().ToUpperInvariant(),
-				    MessageContext.GetCurrent().Headers["connectionString"]));
+				    connectionString));
 
-			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, "Script saved...");
+			bus.Advanced.Routing.Send(MessageContext.GetCurrent().ReturnAddress, new ScriptExecutionConsoleOutput("... script saved."));
         }
 
-		private IBus CreateReplyBus(string transport, string connectionString)
+		private IBus CreateReplyBus(string transport, string connectionString = null)
 		{
 			Action<RebusTransportConfigurer> transportConfig;
 			switch (transport)

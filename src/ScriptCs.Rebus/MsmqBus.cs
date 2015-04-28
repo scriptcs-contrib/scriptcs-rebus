@@ -52,7 +52,7 @@ namespace ScriptCs.Rebus
 		    Console.Write("Sending message of type {0}...", message.GetType().Name);
             try
             {
-                SendBus.Advanced.Routing.Send(Endpoint, message);
+                SendBus.Send(message);
             }
             catch (Exception e)
             {
@@ -79,7 +79,8 @@ namespace ScriptCs.Rebus
             Guard.AgainstNullArgument("action", action);
 
             KnownTypes[typeof(T).Name] = typeof(T);
-	        Container.Handle(action);
+			
+			Container.Handle(action);
 
             return this;
         }
@@ -119,6 +120,7 @@ namespace ScriptCs.Rebus
 
 	        SendBus = Configure.With(Container)
 				.Logging(_loggingConfigurer)
+				.MessageOwnership(ownership => ownership.Use(new ScriptedOwnership(Endpoint)))
 		        .Serialization(serializer => serializer.UseJsonSerializer()
 			        .AddNameResolver(
 				        x => x.Assembly.GetName().Name.Contains("ℛ")
@@ -144,5 +146,6 @@ namespace ScriptCs.Rebus
 			    .CreateBus()
 			    .Start();
 	    }
+
     }
 }

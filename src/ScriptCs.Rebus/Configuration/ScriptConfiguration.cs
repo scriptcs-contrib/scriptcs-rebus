@@ -22,6 +22,7 @@ namespace ScriptCs.Rebus.Configuration
 		internal bool UseMonoVar;
 		internal string ScriptContent;
 		private Action _sendScript;
+		private IBus _logBus;
 
 		public ScriptConfiguration(BaseBus bus, string endpoint)
 		{
@@ -34,8 +35,6 @@ namespace ScriptCs.Rebus.Configuration
 			LocalDependencies = new List<string>();
 			_logEntryHandlers = new List<IReceiveLogEntries>();
 			UseMonoVar = false;
-
-			CreateLogBus();
 		}
 
 		public ScriptConfiguration ImportNamespace(string namespaceName)
@@ -66,6 +65,9 @@ namespace ScriptCs.Rebus.Configuration
 		{
 			get
 			{
+
+				CreateLogBus();
+
 				return new ScriptLoggingConfiguration(this, s => _logEntryHandlers.Add(s));
 			}
 		}
@@ -105,12 +107,13 @@ namespace ScriptCs.Rebus.Configuration
 					switch (message.ExecutionLifetime)
 					{
 						case ScriptExecutionLifetime.Started:
-							Console.WriteLine("Initiating script execution");
+							Console.WriteLine("Initiating script execution...");
 							break;
 						case ScriptExecutionLifetime.Terminated:
-							Console.WriteLine("Finished script execution...");
+							Console.WriteLine("Finished script execution.");
 							//if (_logBus != null) _logBus.Dispose();
-							Bus.ShutDown();
+							//container.Dispose();
+							//Bus.ShutDown();
 							break;
 					}
 				});
@@ -161,7 +164,7 @@ namespace ScriptCs.Rebus.Configuration
 		{
 			var container = ConfigureContainer();
 
-			Configure.With(container)
+			_logBus = Configure.With(container)
 				.Logging(configurer => configurer.None())
 				.Transport(configurer =>
 					configurer.UseMsmq(string.Format("{0}.reply", _endpoint),
@@ -176,15 +179,5 @@ namespace ScriptCs.Rebus.Configuration
 
 			return this;
 		}
-	}
-
-	public interface IExecutionScript
-	{
-		string ScriptContent { get; set; }
-		bool UseMono { get; set; }
-		string[] NuGetDependencies { get; set; }
-		string[] Namespaces { get; set; }
-		string[] LocalDependencies { get; set; }
-		LogLevel LogLevel { get; set; }
 	}
 }
