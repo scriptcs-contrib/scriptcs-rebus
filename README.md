@@ -153,14 +153,14 @@ To be able to send complete scripts or script files using one the above mentione
 
 	Require<RebusScriptBus>()
 		.ConfigureBus("MyMessageQueue")
-		.WithAScript("Console.WriteLine(\"Hello from a host!\")")
+		.With.AScript("Console.WriteLine(\"Hello from a host!\")")
 		.Send()
 
 And a script file:
 
 	Require<RebusScriptBus>()
 		.Configure("MyMessageQueue")
-		.WithAScriptFile("start.csx")
+		.With.AScriptFile("start.csx")
 		.Send()
 
 The script or script file is now sent to a host application that can execute this. Now there is a number of options to go for configuring the execution inside the host application:
@@ -170,7 +170,7 @@ If you want to reference a local assembly to be used in your script, this could 
 
 	Require<RebusScriptBus>()
 		.ConfigureBus("myOwnBus")
-		.WithAScriptFile("start.csx")
+		.With.AScriptFile("start.csx")
 			.AddLocal("someLocal.dll")
 		.Send()
 
@@ -181,7 +181,7 @@ So if your script needs a NuGet package to extend the host, you can specify thes
 
 	Require<RebusScriptBus>()
 		.ConfigureBus("myOwnBus")
-		.WithAScriptFile("start.csx")
+		.With.AScriptFile("start.csx")
 			.AddFromNuGet("mongocsharpdriver")
 		.Send()
 
@@ -192,7 +192,7 @@ So, imagine we now have downloaded a NuGet package or referenced a local assembl
 
 	Require<RebusScriptBus>()
 		.ConfigureBus("myOwnBus")
-		.WithAScriptFile("start.csx")
+		.With.AScriptFile("start.csx")
 			.AddFromNuGet("mongocsharpdriver")
 			.ImportNamespace("MongoDB.Bson")
 		.Send()
@@ -204,25 +204,36 @@ Since the current release of Roslyn, does not support things like the `dynamic` 
 
 	Require<RebusScriptBus>()
 		.ConfigureBus("myOwnBus")
-		.WithScriptFile("start.csx")
+		.With.AScriptFile("start.csx")
 			.UseMono()
 		.Send()
 
 Now the Mono compiler is set as execution engine, the script will be compiled. A scenario like this could also be relevant when doing cross-platform development.
 
 #### Logging
-In some cases it might be great to see some debugging output in the host console.  
+In many cases it might be great to see some debugging output.  
 
 	Require<RebusScriptBus>()
 		.ConfigureBus("myOwnBus")
-		.WithScriptFile("start.csx")
-			.UseLogging()
+		.With.AScriptFile("start.csx")
+			.Log.ToConsole()
 		.Send()
 
-This sets the loglevel to Debug, instead of Info which is default. This feature is only relevant in a limited number of cases where the host is a console application.
+This will send log entries of `LogLevel.Info` to the client's console. You can change the log level like this:
+
+	Require<RebusScriptBus>()
+		.ConfigureBus("myOwnBus")
+		.With.AScriptFile("start.csx")
+			.Log.ToConsole(LogLevel.Debug)
+		.Send()
+
+You can add your own log handler by implementing the `IReceiveLogEntries` interface. Then register the log handler like this:
+
+	Require<RebusScriptBus>()
+		.ConfigureBus("myOwnBus")
+		.With.AScriptFile("start.csx")
+			.Log.To<RollingFile>()
+		.Send()
 
 #### Using Script Packs
 Script packs are really just NuGet packages used for hiding boilerplate code of common frameworks. Therefore, if you download and reference a script pack, it will be made available to the script without any further.
-
-
-
