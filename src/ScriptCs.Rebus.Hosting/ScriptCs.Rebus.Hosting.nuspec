@@ -13,12 +13,14 @@
     <tags>scriptcs rebus scriptpack messaging hosting</tags>
     <dependencies>
       <dependency id="ScriptCs.Rebus" version="0.6.0" />
-      <dependency id="ScriptCs.Hosting" version="0.12.0" />
-      <dependency id="ScriptCs.Engine.Mono" version="0.12.0" />
-      <dependency id="ScriptCs.Engine.Roslyn" version="0.12.0" />
+      <dependency id="ScriptCs.Hosting" version="0.14.1" />
+      <dependency id="ScriptCs.Engine.Mono" version="0.14.1" />
+      <dependency id="ScriptCs.Engine.Roslyn" version="0.14.1" />
       <dependency id="Microsoft.AspNet.WebApi.Core" version="5.2.2" />
       <dependency id="ScriptCs.Rebus.AzureServiceBus" version="0.6.0" />
       <dependency id="ScriptCs.Rebus.RabbitMQ" version="0.6.0" />
+      <dependency id="RabbitMQ.Client" version="3.4.3" />
+      <dependency id="WindowsAzure.ServiceBus" version="2.5.4" />
     </dependencies>
   </metadata>
 </package>

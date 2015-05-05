@@ -12,8 +12,8 @@
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
     <tags>scriptcs rebus script pack messaging msmq</tags>
     <dependencies>
-      <dependency id="Rebus" version="0.77.0" />
-      <dependency id="ScriptCs.Contracts" version="0.12.0" />
+      <dependency id="Rebus" version="0.83.0" />
+      <dependency id="ScriptCs.Contracts" version="0.14.1" />
     </dependencies>
   </metadata>
 </package>

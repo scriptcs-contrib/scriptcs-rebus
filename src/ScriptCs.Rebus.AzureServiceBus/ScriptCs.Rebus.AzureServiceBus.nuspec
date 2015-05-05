@@ -10,7 +10,7 @@
     <copyright>Copyright (c) Mads Tjørnelund Toustrup. (mads@madstt.dk)</copyright>
     <dependencies>
       <dependency id="ScriptCs.Rebus" version="0.6.0" />
-      <dependency id="Rebus.AzureServiceBus" version="0.77.0" />
+      <dependency id="Rebus.AzureServiceBus" version="0.83.0" />
     </dependencies>
     <tags>scriptcs rebus scriptpack messaging azure servicebus</tags>
   </metadata>
