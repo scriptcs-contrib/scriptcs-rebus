@@ -6,7 +6,6 @@ using Rebus.Configuration;
 using Rebus.Logging;
 using Rebus.Transports.Msmq;
 using ScriptCs.Rebus.Logging;
-using ScriptCs.Rebus.Scripts;
 using LogLevel = ScriptCs.Contracts.LogLevel;
 
 namespace ScriptCs.Rebus.Configuration

@@ -41,7 +41,7 @@
     </Reference>
     <Reference Include="Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rebus.0.77.0\lib\NET45\Rebus.dll</HintPath>
+      <HintPath>..\packages\Rebus.0.83.0\lib\NET45\Rebus.dll</HintPath>
     </Reference>
     <Reference Include="Rebus.RabbitMQ">
       <HintPath>..\packages\Rebus.RabbitMQ.0.77.0\lib\NET45\Rebus.RabbitMQ.dll</HintPath>
