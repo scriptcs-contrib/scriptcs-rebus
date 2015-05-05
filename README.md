@@ -255,6 +255,6 @@ This will create a new controller called Customer and add the `Get()` method. It
 			.AsAScriptFile("CustomerController.csx")
 		.Send()
 
-You can read more about this in this blog post.
+You can read more about this in [this blog post](http://madstt.dk/scriptcs-0-6-0/).
 
 
