@@ -33,9 +33,9 @@
     <Reference Include="Rebus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rebus.0.77.0\lib\NET45\Rebus.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptCs.Contracts, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ScriptCs.Contracts, Version=0.14.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ScriptCs.Contracts.0.12.0\lib\net45\ScriptCs.Contracts.dll</HintPath>
+      <HintPath>..\packages\ScriptCs.Contracts.0.14.1\lib\net45\ScriptCs.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />

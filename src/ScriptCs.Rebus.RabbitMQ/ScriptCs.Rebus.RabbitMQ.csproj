@@ -47,10 +47,9 @@
       <HintPath>..\packages\Rebus.RabbitMQ.0.77.0\lib\NET45\Rebus.RabbitMQ.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ScriptCs.Contracts, Version=0.10.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ScriptCs.Contracts, Version=0.14.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ScriptCs.Contracts.0.12.0\lib\net45\ScriptCs.Contracts.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\ScriptCs.Contracts.0.14.1\lib\net45\ScriptCs.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="ScriptCs.Rebus">
       <HintPath>..\packages\ScriptCs.Rebus.0.6.0\lib\net45\ScriptCs.Rebus.dll</HintPath>
