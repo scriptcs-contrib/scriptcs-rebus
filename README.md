@@ -237,3 +237,24 @@ You can add your own log handler by implementing the `IReceiveLogEntries` interf
 
 #### Using Script Packs
 Script packs are really just NuGet packages used for hiding boilerplate code of common frameworks. Therefore, if you download and reference a script pack, it will be made available to the script without any further.
+
+### Dynamic WebAPI Controller Generation
+To dynamically add a new controller to your running WebAPI, you can use the following API:
+
+	Require<RebusScriptBus>()
+		.ConfigureBus("myOwnBus")
+		.With.AWebApiController("Customer")
+			.AsAScript("public string Get() {return \"Listen to your customers!\";}")
+		.Send()
+
+This will create a new controller called Customer and add the `Get()` method. It is also possible to the controller script as a file, like this:
+
+	Require<RebusScriptBus>()
+		.ConfigureBus("myOwnBus")
+		.With.AWebApiController("Customer")
+			.AsAScriptFile("CustomerController.csx")
+		.Send()
+
+You can read more about this in this blog post.
+
+

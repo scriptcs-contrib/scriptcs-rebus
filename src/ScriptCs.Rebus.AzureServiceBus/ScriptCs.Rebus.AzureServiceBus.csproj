@@ -41,9 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Rebus.0.83.0\lib\NET45\Rebus.dll</HintPath>
     </Reference>
-    <Reference Include="Rebus.AzureServiceBus">
-      <HintPath>..\packages\Rebus.AzureServiceBus.0.77.0\lib\NET45\Rebus.AzureServiceBus.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Rebus.AzureServiceBus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rebus.AzureServiceBus.0.83.0\lib\NET45\Rebus.AzureServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="ScriptCs.Contracts, Version=0.14.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
